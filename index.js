@@ -8,10 +8,6 @@ const app = appFramework.create();
 
 const UI = require('watsonworkspace-sdk').UI;
 
-const API = require('./api');
-
-const constants = require('./js/constants');
-
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
 // const sendAnnotaion = (spaceId, url) => {
