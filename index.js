@@ -8,20 +8,10 @@ const app = appFramework.create();
 
 const UI = require('watsonworkspace-sdk').UI;
 
+const constants = require('./js/constants');
 const API = require('./api');
 
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
-
-const sendAnnotaion = (spaceId, url) => {
-    app.sendMessage(spaceId, {
-        actor: { name: '! Warning !' },
-        color: constants.COLOR_ERROR,
-        text: `[${url}](${url})\n*♫♩ Never Gonna Give You Up!*`,
-        title: '',
-        type: 'generic',
-        version: '1'
-    });
-}
 
 const serviceNotFound = (serviceName, spaceId) => {
     app.sendMessage(spaceId, {
