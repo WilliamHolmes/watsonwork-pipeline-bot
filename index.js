@@ -18,7 +18,7 @@ const getCard = data => {
     const { name = '', description: title, people = [] } = data;
     const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
     const actionId = `${constants.ACTION_DETAILS}${JSON.stringify({ name })}`;
-    const date = (_.now()  + 60000);
+    const date = (_.now() - 60000);
     return UI.card(title, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 };
 
@@ -49,7 +49,7 @@ const getService = (message, annotation, params) => {
         if (services.length) {
             return postCards(message, annotation, services);
         }
-        throw new Error('No Services Found');
+        throw new Error('Service Not found');
     }).catch(err => {
         console.log('TCL: getService -> err', err, serviceName);
         serviceNotFound(serviceName, spaceId);

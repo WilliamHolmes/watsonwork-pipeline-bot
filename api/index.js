@@ -9,10 +9,26 @@ const api = {
     getService: txt => {
         console.log('***** TCL: getService txt', txt);
         return db.getDOC(constants.db.DOCS.SERVICES).then(({ [constants.db.keys.SERVICES]: services = []}) => {
-            console.log('***** TCL: services', services.length);
-            return _.filter(services, ({ name, description }) => (`${name} ${description}`.toLowerCase().includes(txt.toLowerCase())));
+            services = _.filter(services, ({ name, description }) => (`${name} ${description}`.toLowerCase().includes(txt.toLowerCase())));
+            console.log('TCL: getService services', services);
+            if(services.length) {
+                return Q.allSettled(_.map(services, api.getPeople)).then(data => {
+                    services = _.pluck(data, 'value');
+                    return services;
+                });
+            }
         });
-    }/*
+    },
+    getPeople: service => {
+        return db.getDOC(constants.db.DOCS.PEOPLE).then(({ [constants.db.keys.PEOPLE]: people = []}) => {
+            console.log('TCL: getPeople people', people);
+            return {
+                ...service,
+                people: _.pluck(people, service.people)
+            };
+        });
+    }
+    /*
     getServices: () => {
 
     }
