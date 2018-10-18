@@ -1,5 +1,6 @@
 const Cloudant = require('cloudant');
 const _ = require('underscore');
+const Q = require('q');
 
 const appFramework = require('watsonworkspace-bot');
 appFramework.level('verbose');
