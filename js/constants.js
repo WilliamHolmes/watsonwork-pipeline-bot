@@ -3,8 +3,10 @@ const _ = require('underscore');
 const ID = _.now();
 
 const constants = {
-    ACTION_ID: `${ID}-pipeline-share|`,
-    BUTTON_SHARE: 'Share With Space',
+    ACTION_DETAILS: `${ID}-pipeline-service-details|`,
+    buttons: {
+        SERVICE_DETAILS: 'Get Service Details'
+    },
     COLOR_ERROR: '#C12228',
     db: {
         NAME: 'pipeline',

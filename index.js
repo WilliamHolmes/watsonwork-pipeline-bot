@@ -15,11 +15,10 @@ app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
 const getCard = data => {
     console.log('TCL: getCard data', data);
-    const { name = '', description = '', people = [] } = data;
-    const title = 'Toscana Service';
-    const subTitle = name;
-    const actionId = `${constants.ACTION_ID}${JSON.stringify({ name, people })}`;
-    return UI.card(title, subTitle, description, [UI.cardButton(constants.BUTTON_SHARE, actionId)]);
+    const { name = '', description: title, people = [] } = data;
+    const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
+    const actionId = `${constants.ACTION_DETAILS}${JSON.stringify({ name })}`;
+    return UI.card(title, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)]);
 };
 
 const getCards = services => _.chain(services).sort('name').map(getCard).value();
