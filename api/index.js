@@ -12,6 +12,7 @@ const api = {
             services = _.filter(services, ({ name, description }) => (`${name} ${description}`.toLowerCase().includes(txt.toLowerCase())));
             console.log('TCL: getService services', services);
             if(services.length) {
+                console.log('TCL: getService  GET PEOPLE')
                 return Q.allSettled(_.map(services, api.getPeople)).then(data => {
                     services = _.pluck(data, 'value');
                     return services;
