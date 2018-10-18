@@ -13,6 +13,20 @@ const API = require('./api');
 
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
+const getCard = (data, buttons = []) => {
+    const { name = '', description = '', people = [] } = data;
+    const title = 'Toscana Service'
+    const subTitle = name;
+    const actionId = `${constants.ACTION_ID}${JSON.stringify({ name, people })}`;
+    return UI.card(title, subTitle, description, [UI.cardButton(constants.BUTTON_SHARE, actionId), ...buttons]);
+};
+
+const getCards = services => _.map(services, service => getCard(service));
+
+const postCards = (message, annotation, services) => {
+    app.sendTargetedMessage(message.userId, annotation, getCards(services));
+};
+
 const serviceNotFound = (serviceName, spaceId) => {
     app.sendMessage(spaceId, {
         actor: { name: 'NOT FOUND' },
@@ -29,9 +43,8 @@ const getService = (message, annotation, params) => {
     const serviceName = _.first(params);
     console.log('TCL: getService -> serviceName', serviceName, spaceId);
     API.getService(serviceName).then(services => {
-        console.log('TCL: getService -> services', services);
-        serviceNotFound(serviceName + "_TEST", spaceId);
-    }).then(err => {
+        postCards(message, annotation, services);
+    }).catch(err => {
         console.log('TCL: getService -> err', err);
         serviceNotFound(serviceName, spaceId);
     })
