@@ -1,5 +1,6 @@
 const _ = require('underscore');
 const Cloudant = require('cloudant');
+const Q = require('q');
 
 const db = require('../db');
 
