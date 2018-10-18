@@ -9,21 +9,18 @@ const constants = require('../js/constants');
 const api = {
     getService: txt => {
         console.log('***** TCL: getService txt', txt);
-        return db.getDOC(constants.db.DOCS.SERVICES).then(({ [constants.db.keys.SERVICES]: services = []}) => {
-            services = _.filter(services, ({ name, description }) => (`${name} ${description}`.toLowerCase().includes(txt.toLowerCase())));
+        return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => {
+            const res = _.filter(services, ({ name, description }) => (`${name} ${description}`.toLowerCase().includes(txt.toLowerCase())));
             console.log('TCL: getService services', services);
             if(services.length) {
                 console.log('TCL: getService  GET PEOPLE')
-                return Q.allSettled(_.map(services, api.getPeople)).then(data => {
-                    services = _.pluck(data, 'value');
-                    return services;
-                });
+                return Q.allSettled(_.map(res, api.getPeople)).then(data => _.pluck(data, 'value'));
             }
         });
     },
     getPeople: service => {
-        return db.getDOC(constants.db.DOCS.PEOPLE).then(({ [constants.db.keys.PEOPLE]: people = []}) => {
-            console.log('TCL: getPeople people', people);
+        return db.getDOC(constants.db.DOCS.PEOPLE).then(({ people = []}) => {
+            console.log('TCL: getPeople', people.length, service.people.length);
             return {
                 ...service,
                 people: _.pluck(people, service.people)
