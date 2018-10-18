@@ -7,7 +7,15 @@ let cloudant = null;
 let cloudantDB = null;
 
 const db = {
-    DOCS: {},
+    docs: {
+        store: {},
+        hasDoc: key => !!db.docs.store[key],
+        getDoc: key => db.docs.store[key],
+        setDoc: (key, doc) => {
+            db.docs.store[key] = doc;
+            return db.docs.store[key];
+        },
+    },
     getCloudant: () => {
         if (!cloudant) {
             cloudant = Cloudant({ vcapServices: JSON.parse(VCAP_SERVICES), plugins: 'promises' });
@@ -20,22 +28,22 @@ const db = {
         }
         return cloudantDB;
     },
-    getDOC: doc => {
+    getDOC: key => {
         return new Promise((resolve, reject) => {
-            if (db.DOCS[doc]) {
-                resolve(db.DOC[doc]);
+            const doc = db.docs.getDoc(key);
+            if (doc) {
+                resolve(doc);
             } else {
-                db.getDB().get(doc, (err, data) => {
+                db.getDB().get(key, (err, data) => {
                     if (err) {
                         reject(err, data);
                     } else {
-                        db.DOC[doc] = data;
-                        resolve(db.DOC[doc]);
+                        resolve(db.docs.setDoc(key, data));
                     }
                 });
             }
         })
-    },
+    }/* ,
     insert: (onInsert, onRevert) => {
         db.getDOC().then(doc => {
             doc = onInsert(doc);
@@ -51,7 +59,7 @@ const db = {
                 }
             });
         });
-    }
+    } */
 }
 
 module.exports = db;
