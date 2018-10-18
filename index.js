@@ -18,7 +18,8 @@ const getCard = data => {
     const { name = '', description: title, people = [] } = data;
     const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
     const actionId = `${constants.ACTION_DETAILS}${JSON.stringify({ name })}`;
-    return UI.card(title, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)]);
+    const date = (_.now()  + 60000);
+    return UI.card(title, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 };
 
 const getCards = services => _.chain(services).sort('name').map(getCard).value();
