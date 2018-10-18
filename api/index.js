@@ -21,9 +21,10 @@ const api = {
     getPeople: service => {
         return db.getDOC(constants.db.DOCS.PEOPLE).then(({ people = []}) => {
             console.log('TCL: getPeople', people.length, service.people.length);
+            people = _.chain(people).indexBy('id').pick(service.people).values().value();
             return {
                 ...service,
-                people: _.pluck(people, service.people)
+                people
             };
         });
     }
