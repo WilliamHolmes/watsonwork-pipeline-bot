@@ -29,6 +29,7 @@ const db = {
         return cloudantDB;
     },
     getDOC: key => {
+        console.log('TCL: getDOC key', key);
         return new Promise((resolve, reject) => {
             const doc = db.docs.getDoc(key);
             if (doc) {

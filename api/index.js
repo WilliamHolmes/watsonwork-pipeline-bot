@@ -7,10 +7,12 @@ const constants = require('../js/constants');
 
 const api = {
     getService: txt => {
+        console.log('***** TCL: getService txt', txt);
         return db.getDOC(constants.db.DOCS.SERVICES).then(({ [constants.db.keys.SERVICES]: services = []}) => {
+            console.log('***** TCL: services', services.length);
             return _.filter(services, ({ name, description }) => (`${name} ${description}`.toLowerCase().includes(txt.toLowerCase())));
         });
-    }/* 
+    }/*
     getServices: () => {
 
     }

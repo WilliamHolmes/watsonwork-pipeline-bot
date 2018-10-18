@@ -27,9 +27,12 @@ const serviceNotFound = (serviceName, spaceId) => {
 const getService = (message, annotation, params) => {
     const { spaceId } = message;
     const serviceName = _.first(params);
+    console.log('TCL: getService -> serviceName', serviceName, spaceId);
     API.getService(serviceName).then(services => {
+        console.log('TCL: getService -> services', services);
         serviceNotFound(serviceName + "_TEST", spaceId);
     }).then(err => {
+        console.log('TCL: getService -> err', err);
         serviceNotFound(serviceName, spaceId);
     })
 };
