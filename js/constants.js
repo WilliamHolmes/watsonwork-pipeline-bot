@@ -5,7 +5,7 @@ const ID = _.now();
 const constants = {
     ACTION_ID: `${ID}-pipeline-share|`,
     BUTTON_SHARE: 'Share With Space',
-    COLOR_ERROR: '#C98AF7',
+    COLOR_ERROR: '#C12228',
     db: {
         NAME: 'pipeline',
         DOCS: {

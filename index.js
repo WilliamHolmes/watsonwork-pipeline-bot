@@ -19,7 +19,7 @@ const getCard = data => {
     const title = 'Toscana Service';
     const subTitle = name;
     const actionId = `${constants.ACTION_ID}${JSON.stringify({ name, people })}`;
-    return UI.card(title, subTitle, description, [UI.cardButton(constants.BUTTON_SHARE, actionId), ...buttons]);
+    return UI.card(title, subTitle, description, [UI.cardButton(constants.BUTTON_SHARE, actionId)]);
 };
 
 const getCards = services => _.chain(services).sort('name').map(getCard).value();
@@ -46,9 +46,12 @@ const getService = (message, annotation, params) => {
     console.log('TCL: getService -> serviceName', serviceName, spaceId);
     API.getService(serviceName).then(services => {
         console.log('TCL: API.getService -> services', services);
-        postCards(message, annotation, services);
+        if (services.length) {
+            return postCards(message, annotation, services);
+        }
+        throw new Error('No Services Found');
     }).catch(err => {
-        console.log('TCL: getService -> err', err);
+        console.log('TCL: getService -> err', err, serviceName);
         serviceNotFound(serviceName, spaceId);
     })
 };
