@@ -57,7 +57,7 @@ const onGetServiceDetails = (message, annotation) => {
             const body = [link, contacts].join('\n\n');
             const actionId = `${constants.ACTION_SHARE_DETAILS}${JSON.stringify({ name, description })}`;
             const buttons = [UI.button(actionId, constants.buttons.SHARE_DETAILS)];
-            app.sendTargetedMessage(userId, annotation, UI.generic(name, body), buttons)
+            app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons))
         }
         throw new Error('Service Not found');
     }).catch(err => {
