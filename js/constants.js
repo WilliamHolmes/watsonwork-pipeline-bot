@@ -3,6 +3,7 @@ const _ = require('underscore');
 const ID = _.now();
 
 const constants = {
+    SERVICE_NOT_FOUND: '404 - Service Not Found',
     ACTION_DETAILS: `${ID}-pipeline-service-details|`,
     buttons: {
         SERVICE_DETAILS: 'Get Service Details'

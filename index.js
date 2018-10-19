@@ -17,27 +17,22 @@ const getCard = data => {
     console.log('TCL: getCard data', data);
     const { name = '', description: title, people = [] } = data;
     const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
+    const description = name.split(' ').join('\n');
     const actionId = `${constants.ACTION_DETAILS}${JSON.stringify({ name })}`;
     const date = (_.now() - 60000);
-    return UI.card(title, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
+    return UI.card(title, subTitle, description, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 };
 
-const getCards = services => _.chain(services).sort('name').map(getCard).value();
+const getCards = services => _.chain(services).sort('description').map(getCard).value();
 
 const postCards = (message, annotation, services) => {
     console.log('TCL: postCards -> services', services);
     app.sendTargetedMessage(message.userId, annotation, getCards(services));
 };
 
-const serviceNotFound = (serviceName, spaceId) => {
-    app.sendMessage(spaceId, {
-        actor: { name: 'NOT FOUND' },
-        color: constants.COLOR_ERROR,
-        text: `${serviceName} - not found.`,
-        title: '',
-        type: 'generic',
-        version: '1'
-    });
+const serviceNotFound = (serviceName, message, annotation) => {
+    const { userId } = message;
+    app.sendTargetedMessage(userId, annotation, UI.generic(constants.SERVICE_NOT_FOUND, `${serviceName} - not found.`))
 }
 
 const getService = (message, annotation, params) => {
@@ -52,7 +47,7 @@ const getService = (message, annotation, params) => {
         throw new Error('Service Not found');
     }).catch(err => {
         console.log('TCL: getService -> err', err, serviceName);
-        serviceNotFound(serviceName, spaceId);
+        serviceNotFound(serviceName, message, annotation);
     })
 };
 
