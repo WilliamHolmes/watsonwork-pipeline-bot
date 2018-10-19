@@ -4,6 +4,8 @@ const ID = _.now();
 
 const constants = {
     SERVICE_NOT_FOUND: '404 - Service Not Found',
+    SEARCH_KEYS: ['description', 'name', 'repo'],
+    SEARCH_OPTIONS: { caseSensitive: false },
     ACTION_DETAILS: `${ID}-pipeline-service-details|`,
     buttons: {
         SERVICE_DETAILS: 'Get Service Details'
