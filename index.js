@@ -1,4 +1,3 @@
-const Cloudant = require('cloudant');
 const _ = require('underscore');
 
 const appFramework = require('watsonworkspace-bot');
@@ -17,10 +16,9 @@ const getCard = data => {
     console.log('TCL: getCard data', data);
     const { name = '', description: title, people = [] } = data;
     const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
-    const description = name.split(' ').join('\n');
     const actionId = `${constants.ACTION_DETAILS}${JSON.stringify({ name })}`;
     const date = (_.now() - 60000);
-    return UI.card(title, subTitle, description, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
+    return UI.card(title, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 };
 
 const getCards = services => _.chain(services).sort('description').map(getCard).value();
