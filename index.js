@@ -53,8 +53,8 @@ const onActionSelected = (message, annotation) => {
     const { userId } = message;
     const { actionId = '' } = annotation;
     console.log('TCL: onActionSelected -> actionId', actionId);
-    if (actionId.includes(constants.ACTION_ID)) {
-        const { description } = JSON.parse(actionId.split(constants.ACTION_ID)[1]);
+    if (actionId.startsWith(constants.ACTION_DETAILS)) {
+        const { description } = JSON.parse(actionId.split(constants.ACTION_DETAILS)[1]);
         console.log('TCL: onActionSelected -> description', description);
         API.getService(description).then(services => {
             console.log('TCL: API.getService -> services', services);
