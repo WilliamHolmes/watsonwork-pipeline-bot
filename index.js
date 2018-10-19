@@ -63,7 +63,7 @@ const onGetServiceDetails = (message, annotation) => {
 const onShareServiceDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
     console.log('TCL: onShareServiceDetails -> actionId', actionId);
-    const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
+    const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_SHARE_DETAILS));
     API.getService(description).then(services => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
