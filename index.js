@@ -54,7 +54,7 @@ const onActionSelected = (message, annotation) => {
                 const { name, people, repo } = _.first(services);
                 const link = `${constants.GIT_REPO}/${repo}`
                 const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${displayName}>`).join('\n');
-                const body = [link, contacts].join|('\n\n');
+                const body = [link, contacts].join('\n\n');
                 app.sendTargetedMessage(userId, annotation, UI.generic(name, body))
             }
             throw new Error('Service Not found');
