@@ -19,13 +19,13 @@ const getCard = data => {
     const actionId = `${constants.ACTION_GET_DETAILS}${JSON.stringify({ name, description })}`;
     const date = (_.now() - 60000);
     return UI.card(description, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
-};
+}
 
 const getCards = services => _.chain(services).sort('description').map(getCard).value();
 
 const postCards = (message, annotation, services) => {
     app.sendTargetedMessage(message.userId, annotation, getCards(services));
-};
+}
 
 const serviceNotFound = (serviceName, message, annotation) => {
     const { userId } = message;
@@ -33,17 +33,14 @@ const serviceNotFound = (serviceName, message, annotation) => {
 }
 
 const getService = (message, annotation, params) => {
-    const { spaceId } = message;
     const serviceName = _.first(params);
     API.getService(serviceName).then(services => {
         if (services.length) {
             return postCards(message, annotation, services);
         }
         throw new Error('Service Not found');
-    }).catch(err => {
-        serviceNotFound(serviceName, message, annotation);
-    })
-};
+    }).catch(() => serviceNotFound(serviceName, message, annotation));
+}
 
 const onGetServiceDetails = (message, annotation) => {
     const { userId } = message;
@@ -60,12 +57,24 @@ const onGetServiceDetails = (message, annotation) => {
             app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons))
         }
         throw new Error('Service Not found');
-    }).catch(err => {
-        serviceNotFound(name, message, annotation);
-    })
+    }).catch(() => serviceNotFound(name, message, annotation));
 }
 
-const onShareServiceDetails = () => {};
+const onShareServiceDetails = (message, annotation) => {
+    const { actionId = '' } = annotation;
+    const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
+    API.getService(description).then(services => {
+        if (services.length) {
+            const { people } = _.first(services);
+            const { userId, spaceId } = message;
+            const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
+            const data = `${description}\n\n${contacts}`;
+            app.sendMessage(spaceId, data);
+            app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
+        }
+        throw new Error('Service Not found');
+    }).catch(() => serviceNotFound(name, message, annotation));
+};
 
 const onActionSelected = (message, annotation) => {
     const { actionId = '' } = annotation;
