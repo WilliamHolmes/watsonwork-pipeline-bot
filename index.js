@@ -41,23 +41,24 @@ const getService = (message, annotation, params) => {
     }).catch(() => serviceNotFound(serviceName, message, annotation));
 }
 
-// const onGetServiceDetails = (message, annotation) => {
-//     const { userId } = message;
-//     let { actionId = '' } = annotation;
-//     const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
-//     API.getService(description).then(services => {
-//         if (_.isEmpty(services)) {
-//             throw new Error('Service Not found');
-//         }
-//         const { people, repo } = _.first(services);
-//         const link = `${constants.GIT_REPO}/${repo}`
-//         const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
-//         const body = [link, contacts].join('\n\n');
-//         actionId = `${constants.ACTION_SHARE_DETAILS}${JSON.stringify({ name, description })}`;
-//         const buttons = [UI.button(actionId, constants.buttons.SHARE_DETAILS)];
-//         app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
-//     }).catch(() => serviceNotFound(name, message, annotation));
-// }
+const onGetServiceDetails = (message, annotation) => {
+    const { userId } = message;
+    let { actionId = '' } = annotation;
+    const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
+    API.getService(description).then(services => {
+        if (_.isEmpty(services)) {
+            throw new Error('Service Not found');
+        }
+        const { people, repo } = _.first(services);
+        const link = `${constants.GIT_REPO}/${repo}`
+        const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
+        const body = [link, contacts].join('\n\n');
+        actionId = `${constants.ACTION_SHARE_DETAILS}${JSON.stringify({ name, description })}`;
+        console.log('TCL: onGetServiceDetails -> actionId', actionId);
+        const buttons = [UI.button(actionId, constants.buttons.SHARE_DETAILS)];
+        app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
+    }).catch(() => serviceNotFound(name, message, annotation));
+}
 
 // const onShareServiceDetails = (message, annotation) => {
 //     const { actionId = '' } = annotation;
@@ -75,18 +76,18 @@ const getService = (message, annotation, params) => {
 //     }).catch(() => serviceNotFound(name, message, annotation));
 // };
 
-// const onActionSelected = (message, annotation) => {
-//     const { actionId = '' } = annotation;
-//     switch(true) {
-//         case actionId.startsWith(constants.ACTION_GET_DETAILS):
-//             return onGetServiceDetails(message, annotation);
-//         case actionId.startsWith(constants.ACTION_SHARE_DETAILS):
-//             return onShareServiceDetails(message, annotation);
-//         default:
-//             return;
-//     }
-// }
+const onActionSelected = (message, annotation) => {
+    const { actionId = '' } = annotation;
+    switch(true) {
+        case actionId.startsWith(constants.ACTION_GET_DETAILS):
+            return onGetServiceDetails(message, annotation);
+        case actionId.startsWith(constants.ACTION_SHARE_DETAILS):
+            return onShareServiceDetails(message, annotation);
+        default:
+            return;
+    }
+}
 
 app.on('actionSelected:/service', getService);
 
-// app.on('actionSelected', onActionSelected);
+app.on('actionSelected', onActionSelected);
