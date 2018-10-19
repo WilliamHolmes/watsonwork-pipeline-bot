@@ -7,6 +7,9 @@ const constants = require('../js/constants');
 const search = require('../js/search');
 
 const api = {
+    getServiceById: id => {
+        return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => _.where(services, { id }));
+    },
     getService: txt => {
         return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => {
             if(services.length) {

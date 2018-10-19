@@ -14,9 +14,9 @@ const API = require('./api');
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
 const getCard = data => {
-    const { name = '', description, people = [] } = data;
+    const { id, name = '', description, people = [] } = data;
     const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
-    const actionId = `${constants.ACTION_GET_DETAILS}${JSON.stringify({ name, description })}`;
+    const actionId = `${constants.ACTION_GET_DETAILS}${id}`;
     const date = (_.now() - 60000);
     return UI.card(description, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 }
@@ -31,7 +31,7 @@ const serviceFound = (message, annotation, services) => {
     app.sendTargetedMessage(message.userId, annotation, getCards(services));
 }
 
-const getService = (message, annotation, params) => {
+const findService = (message, annotation, params) => {
     const serviceName = _.first(params);
     API.getService(serviceName).then(services => {
         if (_.isEmpty(services)) {
@@ -44,16 +44,16 @@ const getService = (message, annotation, params) => {
 const onGetServiceDetails = (message, annotation) => {
     const { userId } = message;
     const { actionId = '' } = annotation;
-    const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
-    API.getService(description).then(services => {
+    const serviceId = strings.chompLeft(actionId, constants.ACTION_GET_DETAILS);
+    API.getServiceById(serviceId).then(services => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
         }
-        const { people, repo } = _.first(services);
+        const { name, people, repo } = _.first(services);
         const link = `${constants.GIT_REPO}/${repo}`
         const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
         const body = [link, contacts].join('\n\n');
-        const shareActionId = `${constants.ACTION_SHARE_DETAILS}${JSON.stringify({ name, description })}`;
+        const shareActionId = `${constants.ACTION_SHARE_DETAILS}${serviceId}`;
         console.log('TCL: onGetServiceDetails -> actionId', actionId);
         const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
         app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
@@ -63,15 +63,15 @@ const onGetServiceDetails = (message, annotation) => {
 const onShareServiceDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
     console.log('TCL: onShareServiceDetails -> actionId', actionId);
-    const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_SHARE_DETAILS));
-    API.getService(description).then(services => {
+    const serviceId = strings.chompLeft(actionId, constants.ACTION_SHARE_DETAILS);
+    API.getServiceById(serviceId).then(services => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
         }
-        const { people } = _.first(services);
+        const { name, description, people } = _.first(services);
         const { userId, spaceId } = message;
         const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
-        const data = `${description}\n\n${contacts}`;
+        const data = `${name}\n\n${contacts}`;
         app.sendMessage(spaceId, data);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
@@ -89,6 +89,6 @@ const onActionSelected = (message, annotation) => {
     }
 }
 
-app.on('actionSelected:/service', getService);
+app.on('actionSelected:/service', findService);
 
 app.on('actionSelected', onActionSelected);
