@@ -16,7 +16,7 @@ const getCard = data => {
     console.log('TCL: getCard data', data);
     const { name = '', description: title, people = [] } = data;
     const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
-    const actionId = `${constants.ACTION_DETAILS}${JSON.stringify({ name })}`;
+    const actionId = `${constants.ACTION_DETAILS}${JSON.stringify({ name, description })}`;
     const date = (_.now() - 60000);
     return UI.card(title, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 };
@@ -49,4 +49,33 @@ const getService = (message, annotation, params) => {
     })
 };
 
+const onActionSelected = (message, annotation) => {
+    const { userId } = message;
+    const { actionId = '' } = annotation;
+    console.log('TCL: onActionSelected -> actionId', actionId);
+    if (actionId.includes(constants.ACTION_ID)) {
+        const { description } = JSON.parse(actionId.split(constants.ACTION_ID)[1]);
+        console.log('TCL: onActionSelected -> description', description);
+        API.getService(description).then(services => {
+            console.log('TCL: API.getService -> services', services);
+            if (services.length) {
+                const { name, people } = _.first(services);
+
+                const title = `${name}`;
+                const service = `${description.split(' ').join('\n')}`
+                const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${displayName}>`).join('\n');
+
+                const body = [service, contacts].join('\n\n');
+                app.sendTargetedMessage(userId, annotation, UI.generic(title, body))
+            }
+            throw new Error('Service Not found');
+        }).catch(err => {
+            console.log('TCL: getService -> err', err, serviceName);
+            serviceNotFound(name, message, annotation);
+        })
+    }
+}
+
 app.on('actionSelected:/service', getService);
+
+app.on('actionSelected', onActionSelected);
