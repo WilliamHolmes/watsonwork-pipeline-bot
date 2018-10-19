@@ -8,6 +8,7 @@ const app = appFramework.create();
 const UI = require('watsonworkspace-sdk').UI;
 
 const constants = require('./js/constants');
+const strings = require('./js/strings');
 const API = require('./api');
 
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
@@ -15,7 +16,7 @@ app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 const getCard = data => {
     const { name = '', description, people = [] } = data;
     const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
-    const actionId = `${constants.ACTION_DETAILS}${JSON.stringify({ name, description })}`;
+    const actionId = `${constants.ACTION_GET_DETAILS}${JSON.stringify({ name, description })}`;
     const date = (_.now() - 60000);
     return UI.card(description, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 };
@@ -44,23 +45,37 @@ const getService = (message, annotation, params) => {
     })
 };
 
-const onActionSelected = (message, annotation) => {
+const onGetServiceDetails = (message, annotation) => {
     const { userId } = message;
     const { actionId = '' } = annotation;
-    if (actionId.startsWith(constants.ACTION_DETAILS)) {
-        const { description } = JSON.parse(actionId.split(constants.ACTION_DETAILS)[1]);
-        API.getService(description).then(services => {
-            if (services.length) {
-                const { name, people, repo } = _.first(services);
-                const link = `${constants.GIT_REPO}/${repo}`
-                const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${displayName}>`).join('\n');
-                const body = [link, contacts].join('\n\n\n');
-                app.sendTargetedMessage(userId, annotation, UI.generic(name, body))
-            }
-            throw new Error('Service Not found');
-        }).catch(err => {
-            serviceNotFound(name, message, annotation);
-        })
+    const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
+    API.getService(description).then(services => {
+        if (services.length) {
+            const { people, repo } = _.first(services);
+            const link = `${constants.GIT_REPO}/${repo}`
+            const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
+            const body = [link, contacts].join('\n\n');
+            const actionId = `${constants.ACTION_SHARE_DETAILS}${JSON.stringify({ name, description })}`;
+            const buttons = [UI.button(actionId, constants.buttons.SHARE_DETAILS)];
+            app.sendTargetedMessage(userId, annotation, UI.generic(name, body), buttons)
+        }
+        throw new Error('Service Not found');
+    }).catch(err => {
+        serviceNotFound(name, message, annotation);
+    })
+}
+
+const onShareServiceDetails = () => {};
+
+const onActionSelected = (message, annotation) => {
+    const { actionId = '' } = annotation;
+    switch(true) {
+        case actionId.startsWith(constants.ACTION_GET_DETAILS):
+            return onGetServiceDetails(message, annotation);
+        case actionId.startsWith(constants.ACTION_SHARE_DETAILS):
+            return onShareServiceDetails(message, annotation);
+        default:
+            return;
     }
 }
 
