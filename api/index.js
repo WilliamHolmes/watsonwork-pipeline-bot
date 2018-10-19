@@ -8,7 +8,11 @@ const search = require('../js/search');
 
 const api = {
     getServiceById: id => {
-        return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => _.where(services, { id }));
+        return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => {
+            if(services.length) {
+                return Q.allSettled(_.map(_.where(services, { id }), api.getPeople)).then(data => _.pluck(data, 'value'));
+            }
+        });
     },
     getService: txt => {
         return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => {
