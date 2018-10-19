@@ -63,18 +63,18 @@ const onGetServiceDetails = (message, annotation) => {
 const onShareServiceDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
     console.log('TCL: onShareServiceDetails -> actionId', actionId);
-    // const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
-    // API.getService(description).then(services => {
-    //     if (_.isEmpty(services)) {
-    //         throw new Error('Service Not found');
-    //     }
-    //     const { people } = _.first(services);
-    //     const { userId, spaceId } = message;
-    //     const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
-    //     const data = `${description}\n\n${contacts}`;
-    //     app.sendMessage(spaceId, data);
-    //     app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
-    // }).catch(() => serviceNotFound(name, message, annotation));
+    const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
+    API.getService(description).then(services => {
+        if (_.isEmpty(services)) {
+            throw new Error('Service Not found');
+        }
+        const { people } = _.first(services);
+        const { userId, spaceId } = message;
+        const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
+        const data = `${description}\n\n${contacts}`;
+        app.sendMessage(spaceId, data);
+        app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
+    }).catch(() => serviceNotFound(name, message, annotation));
 };
 
 const onActionSelected = (message, annotation) => {
