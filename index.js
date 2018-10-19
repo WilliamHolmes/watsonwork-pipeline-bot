@@ -47,16 +47,16 @@ const onGetServiceDetails = (message, annotation) => {
     let { actionId = '' } = annotation;
     const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
     API.getService(description).then(services => {
-        if (services.length) {
-            const { people, repo } = _.first(services);
-            const link = `${constants.GIT_REPO}/${repo}`
-            const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
-            const body = [link, contacts].join('\n\n');
-            actionId = `${constants.ACTION_SHARE_DETAILS}${JSON.stringify({ name, description })}`;
-            const buttons = [UI.button(actionId, constants.buttons.SHARE_DETAILS)];
-            app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons))
+        if (_.isEmpty(services)) {
+            throw new Error('Service Not found');
         }
-        throw new Error('Service Not found');
+        const { people, repo } = _.first(services);
+        const link = `${constants.GIT_REPO}/${repo}`
+        const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
+        const body = [link, contacts].join('\n\n');
+        actionId = `${constants.ACTION_SHARE_DETAILS}${JSON.stringify({ name, description })}`;
+        const buttons = [UI.button(actionId, constants.buttons.SHARE_DETAILS)];
+        app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
     }).catch(() => serviceNotFound(name, message, annotation));
 }
 
@@ -64,15 +64,15 @@ const onShareServiceDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
     const { name, description } = JSON.parse(strings.chompLeft(actionId, constants.ACTION_GET_DETAILS));
     API.getService(description).then(services => {
-        if (services.length) {
-            const { people } = _.first(services);
-            const { userId, spaceId } = message;
-            const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
-            const data = `${description}\n\n${contacts}`;
-            app.sendMessage(spaceId, data);
-            app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
+        if (_.isEmpty(services)) {
+            throw new Error('Service Not found');
         }
-        throw new Error('Service Not found');
+        const { people } = _.first(services);
+        const { userId, spaceId } = message;
+        const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
+        const data = `${description}\n\n${contacts}`;
+        app.sendMessage(spaceId, data);
+        app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
 };
 
