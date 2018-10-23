@@ -64,9 +64,7 @@ const onGetServiceDetails = (message, annotation) => {
 }
 
 const sendGenericAnnotation = (spaceId, title = '', text = '', name = '') =>  {
-    const { annotation, color } = constants;
-    const message = { title, text, actor: { name } };
-    app.sendMessage(spaceId, { message, type: annotation.GENERIC, version: '1', color: color.GENERIC });
+    app.sendMessage(spaceId, _.extend({ title, text, actor: { name } }, constants.annotations.GENERIC));
 }
 
 const onShareServiceDetails = (message, annotation) => {
@@ -83,7 +81,7 @@ const onShareServiceDetails = (message, annotation) => {
         const contacts = getContacts(people);
         const text = `\n${name}\n\ncontacts:\n${contacts}`;
 
-        sendGenericAnnotation(spaceId, constants.SERVICE, text, description);
+        sendGenericAnnotation(spaceId, constats.SERVICE, text, description);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
 };
