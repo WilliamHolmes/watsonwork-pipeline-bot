@@ -71,7 +71,7 @@ const onShareServiceDetails = (message, annotation) => {
         const { name, description, people, repo } = _.first(services);
         const { userId, spaceId } = message;
         const contacts = _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
-        const link = `- ${constants.GIT_REPO}/${repo}`
+        const link = `${constants.GIT_REPO}/${repo}`
         const data = `service: [${name}](${link})\n\ncontacts:\n${contacts}`;
         app.sendMessage(spaceId, data);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
