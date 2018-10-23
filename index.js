@@ -56,32 +56,34 @@ const onGetServiceDetails = (message, annotation) => {
         const { name, people, repo } = _.first(services);
         const link = `- ${constants.GIT_REPO}/${repo}`
         const contacts =  getContacts(people);
-        const body = [`repo:\n${link}`, `concats:\n${contacts}`].join('\n\n');
+        const body = [`repo:\n${link}`, `contacts:\n${contacts}`].join('\n\n');
         const shareActionId = `${constants.ACTION_SHARE_DETAILS}${serviceId}`;
-        console.log('TCL: onGetServiceDetails -> actionId', actionId);
         const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
         app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
     }).catch(() => serviceNotFound(name, message, annotation));
 }
 
-const sendGenericAnnotation = (spaceId, message) =>  {
+const sendGenericAnnotation = (spaceId, title = '', text = '', name = '') =>  {
     const { annotation, color } = constants;
+    const message = { title, text, actor: { name } };
     app.sendMessage(spaceId, { message, type: annotation.GENERIC, version: '1', color: color.GENERIC });
 }
 
 const onShareServiceDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
-    console.log('TCL: onShareServiceDetails -> actionId', actionId);
     const serviceId = strings.chompLeft(actionId, constants.ACTION_SHARE_DETAILS);
+
     API.getServiceById(serviceId).then(services => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
         }
+
         const { name, description, people } = _.first(services);
         const { userId, spaceId } = message;
         const contacts = getContacts(people);
-        const data = `service:\n *${name}*\n\ncontacts:\n${contacts}`;
-        sendGenericAnnotation(spaceId, data);
+        const text = `\n${name}\n\ncontacts:\n${contacts}`;
+
+        sendGenericAnnotation(spaceId, constants.SERVICE, text, description);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
 };

@@ -1,6 +1,7 @@
 const _ = require('underscore');
 
 const constants = {
+    SERVICE: 'service',
     GIT_REPO: 'https://github.ibm.com/toscana',
     SERVICE_NOT_FOUND: '404 - Service Not Found',
     SEARCH_KEYS: ['description', 'name', 'repo'],
