@@ -12,7 +12,12 @@ const constants = {
         SERVICE_DETAILS: 'Get Service Details',
         SHARE_DETAILS: 'Share with Space'
     },
-    COLOR_ERROR: '#C12228',
+    annotation: {
+        GENERIC: 'generic'
+    },
+    color: {
+        GENERIC: '#C12228',
+    },
     db: {
         NAME: 'pipeline',
         DOCS: {

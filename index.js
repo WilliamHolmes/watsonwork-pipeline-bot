@@ -41,6 +41,10 @@ const findService = (message, annotation, params) => {
     }).catch(() => serviceNotFound(serviceName, message, annotation));
 }
 
+const getContacts = people => {
+    return _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
+}
+
 const onGetServiceDetails = (message, annotation) => {
     const { userId } = message;
     const { actionId = '' } = annotation;
@@ -51,13 +55,18 @@ const onGetServiceDetails = (message, annotation) => {
         }
         const { name, people, repo } = _.first(services);
         const link = `- ${constants.GIT_REPO}/${repo}`
-        const contacts =  _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
+        const contacts =  getContacts(people);
         const body = [`repo:\n${link}`, `concats:\n${contacts}`].join('\n\n');
         const shareActionId = `${constants.ACTION_SHARE_DETAILS}${serviceId}`;
         console.log('TCL: onGetServiceDetails -> actionId', actionId);
         const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
         app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
     }).catch(() => serviceNotFound(name, message, annotation));
+}
+
+const sendGenericAnnotation = (spaceId, message) =>  {
+    const { annotation, color } = constants;
+    app.sendMessage(spaceId, { message, type: annotation.GENERIC, version: '1', color: color.GENERIC });
 }
 
 const onShareServiceDetails = (message, annotation) => {
@@ -68,11 +77,11 @@ const onShareServiceDetails = (message, annotation) => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
         }
-        const { name, description, people, repo } = _.first(services);
+        const { name, description, people } = _.first(services);
         const { userId, spaceId } = message;
-        const contacts = _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
-        const data = `service:\n- *${name}*\n\ncontacts:\n${contacts}`;
-        app.sendMessage(spaceId, data);
+        const contacts = getContacts(people);
+        const data = `service:\n *${name}*\n\ncontacts:\n${contacts}`;
+        sendGenericAnnotation(spaceId, data);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
 };
