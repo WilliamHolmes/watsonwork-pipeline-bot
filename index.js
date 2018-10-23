@@ -45,6 +45,11 @@ const getContacts = people => {
     return _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
 }
 
+const getRepositories = (data = '') => {
+    const repos = data.split(' ');
+    return _.map(repos, repo => `[${repo}](${constants.GIT_REPO}/${repo})`);
+}
+
 const onGetServiceDetails = (message, annotation) => {
     const { userId } = message;
     const { actionId = '' } = annotation;
@@ -79,9 +84,10 @@ const onShareServiceDetails = (message, annotation) => {
         const { name, description, people } = _.first(services);
         const { userId, spaceId } = message;
         const contacts = getContacts(people);
-        const text = `\n${name}\n\ncontacts:\n${contacts}`;
+        const repoDetails = getRepositories(name);
+        const text = `\n${repoDetails}\n\ncontacts:\n${contacts}`;
 
-        sendGenericAnnotation(spaceId, constants.SERVICE, text, description);
+        sendGenericAnnotation(spaceId, description, text, constants.SERVICE);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
 };
