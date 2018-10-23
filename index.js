@@ -68,10 +68,10 @@ const onShareServiceDetails = (message, annotation) => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
         }
-        const { name, description, people } = _.first(services);
+        const { name, description, people, repo } = _.first(services);
         const { userId, spaceId } = message;
         const contacts = _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
-        const data = `repo:\n- ${name}\n\ncontacts:\n${contacts}`;
+        const data = `repo: [${name}](repo)\n\ncontacts:\n${contacts}`;
         app.sendMessage(spaceId, data);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
