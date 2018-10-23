@@ -81,7 +81,7 @@ const onShareServiceDetails = (message, annotation) => {
         const contacts = getContacts(people);
         const text = `\n${name}\n\ncontacts:\n${contacts}`;
 
-        sendGenericAnnotation(spaceId, constats.SERVICE, text, description);
+        sendGenericAnnotation(spaceId, constants.SERVICE, text, description);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
 };
