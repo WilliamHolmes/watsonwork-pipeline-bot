@@ -46,8 +46,7 @@ const getContacts = people => {
 }
 
 const getRepositories = (data = '') => {
-    const repos = data.split(' ');
-    return _.map(repos, repo => `[${repo}](${constants.GIT_REPO}/${repo})`);
+    return _.map(data.split(' '), repo => `[${repo}](${constants.GIT_REPO}/${repo})`).join('\n');
 }
 
 const onGetServiceDetails = (message, annotation) => {
