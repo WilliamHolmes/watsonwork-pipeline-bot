@@ -50,9 +50,9 @@ const onGetServiceDetails = (message, annotation) => {
             throw new Error('Service Not found');
         }
         const { name, people, repo } = _.first(services);
-        const link = `${constants.GIT_REPO}/${repo}`
-        const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
-        const body = [link, contacts].join('\n\n');
+        const link = `- ${constants.GIT_REPO}/${repo}`
+        const contacts =  _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
+        const body = [`repo:\n${link}`, `concats:\n${contacts}`].join('\n\n');
         const shareActionId = `${constants.ACTION_SHARE_DETAILS}${serviceId}`;
         console.log('TCL: onGetServiceDetails -> actionId', actionId);
         const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
@@ -70,8 +70,8 @@ const onShareServiceDetails = (message, annotation) => {
         }
         const { name, description, people } = _.first(services);
         const { userId, spaceId } = message;
-        const contacts = _.map(people, ({ id, displayName }) => `<@${id}|${strings.titleCase(displayName)}>`).join('\n');
-        const data = `${name}\n\n${contacts}`;
+        const contacts = _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
+        const data = `repo:\n- ${name}\n\ncontacts:\n${contacts}`;
         app.sendMessage(spaceId, data);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(() => serviceNotFound(name, message, annotation));
