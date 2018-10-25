@@ -33,6 +33,7 @@ const serviceFound = (message, annotation, services) => {
 
 const findService = (message, annotation, params) => {
     const serviceName = _.first(params);
+    console.log('TCL: findService -> serviceName', serviceName);
     API.getService(serviceName).then(services => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
