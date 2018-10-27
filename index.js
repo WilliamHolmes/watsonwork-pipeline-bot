@@ -108,7 +108,7 @@ const findCommitters = (message, annotation, params) => {
     const repository = _.first(params);
     console.log('TCL: findCommitters -> repository', repository);
     const { userId } = message;
-    API.repository(repository).then(repositories => {
+    API.getRepository(repository).then(repositories => {
         console.log('TCL: findCommitters -> repositories', repositories);
         app.sendTargetedMessage(userId, annotation, UI.generic('test', JSON.stringify(repositories), []));
     });
