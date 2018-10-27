@@ -104,6 +104,16 @@ const onActionSelected = (message, annotation) => {
     }
 }
 
+const findCommitters = (message, annotation, params) => {
+    const repository = _.first(params);
+    const { userId } = message;
+    API.repository(serviceName).then(repositories => {
+        app.sendTargetedMessage(userId, annotation, UI.generic('test', JSON.stringify(repositories), []));
+    });
+}
+
 app.on('actionSelected:/service', findService);
+
+app.on('actionSelected:/committers', findCommitters);
 
 app.on('actionSelected', onActionSelected);

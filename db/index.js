@@ -44,9 +44,9 @@ const db = {
                 });
             }
         })
-    }/* ,
-    insert: (onInsert, onRevert) => {
-        db.getDOC().then(doc => {
+    },
+    insert: (key, onInsert, onRevert) => {
+        db.getDOC(key).then(doc => {
             doc = onInsert(doc);
             db.getDB().insert(doc, (err, data) => {
                 if (data && data.rev) {
@@ -60,7 +60,7 @@ const db = {
                 }
             });
         });
-    } */
+    }
 }
 
 module.exports = db;
