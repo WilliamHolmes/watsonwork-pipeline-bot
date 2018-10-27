@@ -58,6 +58,7 @@ const db = {
                 } else {
                     console.log('DB INSERT OK');
                 }
+                db.docs.setDoc(key, doc);
             });
         });
     }

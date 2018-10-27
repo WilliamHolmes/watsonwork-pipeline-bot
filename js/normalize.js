@@ -1,7 +1,5 @@
 const _ = require('underscore');
-const {
-    normalize,
-    Schema, arrayOf } = require('normalizr');
+const { normalize, Schema, arrayOf } = require('normalizr');
 
 const teams = new Schema('_root');
 

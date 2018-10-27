@@ -52,7 +52,7 @@ const api = {
             if (_.isEmpty(repositories)) {
                 return api.getTeamsData().then(updateRepositories);
             }
-            return Promise.resolve(repositories);
+            return repositories;
         });
     },
     updateRepositories: data => {
