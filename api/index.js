@@ -40,7 +40,7 @@ const api = {
                 'Content-Type': 'applciation/json',
                 'Authorization': `Bearer ${process.env.GIT_TOSCANA_TOKEN}`
             }
-        }).then(res => res.json()).then(resolve).catch(reject);
+        }).then(res => res.json());
     },
     getRepository: name => {
         return api.getRepositories().then(repositories => {
