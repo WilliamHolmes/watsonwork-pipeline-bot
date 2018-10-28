@@ -33,6 +33,7 @@ const api = {
         });
     },
     getTeamsData: () => {
+        console.log('TCL: getTeamsData');
         return fetch('https://github.ibm.com/api/graphql', {
             method: 'POST',
             body: JSON.stringify({ query }),
@@ -48,18 +49,18 @@ const api = {
         });
     },
     getRepositories: () => {
+        console.log('TCL: getRepositories');
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ repositories }) => {
+            console.log('TCL: getRepositories repositories', repositories);
             if (_.isEmpty(repositories)) {
                 return api.getTeamsData().then(updateRepositories);
             }
             return repositories;
         });
     },
-    updateRepositories: data => {
-        const obj = normalize(data);
-        return db.getDOC(constants.db.DOCS.TEAMS).then(doc => {
-            return db.insert(doc, obj).then(() => obj);
-        });
+    updateRepositories: obj => {
+        console.log('updateRepositories: obj', obj);
+        return db.updateDOC(constants.db.DOCS.TEAMS, normalize(obj));
     }
 }
 

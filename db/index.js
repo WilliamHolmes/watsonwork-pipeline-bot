@@ -1,4 +1,5 @@
 const Cloudant = require('cloudant');
+const constants = require('../js/constants');
 
 const { env: { CLOUDANT_URL, CLOUDANT_DB, VCAP_SERVICES } } = process;
 
@@ -28,7 +29,7 @@ const db = {
         return cloudantDB;
     },
     getDOC: key => {
-        console.log('TCL: getDOC key', key);
+        console.log('getDOC key', key);
         return new Promise((resolve, reject) => {
             const doc = db.docs.getDoc(key);
             if (doc) {
@@ -44,38 +45,25 @@ const db = {
             }
         })
     },
-    insert: (doc, data) => {
-        const obj = { ...doc, ...data };
-        return db.getDB().insert(obj, (err, data) => {
-            if (data && data.rev) {
-                obj._rev = data.rev;
-            }
-            if (err) {
-                obj = doc;
-                console.log('DB INSERT ERROR', err);
-            } else {
-                console.log('DB INSERT OK');
-            }
-            db.docs.setDoc(key, obj);
-        });
-    }/* ,
-    insert: (key, onInsert, onRevert) => {
+    updateDOC: (key, data) => {
+        console.log('updateDOC: key, data', key, data);
         return db.getDOC(key).then(doc => {
-            doc = onInsert(doc);
-            return db.getDB().insert(doc, (err, data) => {
+            const newDoc = { ...doc, ...data };
+            return db.getDB().insert(newDoc, (err, data) => {
+            console.log('DB INSERT: err, data', err, data);
                 if (data && data.rev) {
-                    doc._rev = data.rev;
+                    newDoc._rev = data.rev;
                 }
                 if (err) {
-                    doc = onRevert(doc);
+                    newDoc = doc;
                     console.log('DB INSERT ERROR', err);
                 } else {
                     console.log('DB INSERT OK');
                 }
-                db.docs.setDoc(key, doc);
+                return db.docs.setDoc(key, newDoc);
             });
         });
-    } */
+    }
 }
 
 module.exports = db;
