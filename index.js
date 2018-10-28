@@ -29,7 +29,7 @@ const repositoryCard = data => {
     return UI.card(name, subTitle, projectsUrl, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
 }
 
-const getCards = (data, sortKey, cardType) => _.chain(data).sort(sortKey).map(cardType).value();
+const getCards = (data, sortKey, cardType) => _.chain(data).sortBy(sortKey).map(cardType).value();
 
 const serviceNotFound = (serviceName, message, annotation) => {
     app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.SERVICE_NOT_FOUND, `${serviceName} - not found.`))
