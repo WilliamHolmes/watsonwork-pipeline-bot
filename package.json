@@ -37,6 +37,7 @@
     "dotenv": "^4.0.0",
     "fuzzy-search": "^2.1.0",
     "lodash": "^4.17.4",
+    "node-fetch": "^2.2.0",
     "normalizr": "^3.3.0",
     "q": "^1.5.1",
     "string": "^3.3.3",
