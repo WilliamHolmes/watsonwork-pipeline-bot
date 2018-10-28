@@ -28,7 +28,7 @@ const mergeIntoEntity = (entityA, entityB) => {
 const removeNodes = nodes => {
     return _.map(nodes, team => {
         const { members: { nodes: members }, repositories: { nodes: repositories } } = team;
-        return { ...team, members, repositories };
+        return Object.assign({}, team, { members, repositories });
     });
 }
 

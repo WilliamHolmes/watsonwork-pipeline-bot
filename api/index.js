@@ -26,10 +26,9 @@ const api = {
     },
     getPeople: service => {
         return db.getDOC(constants.db.DOCS.PEOPLE).then(({ people = []}) => {
-            return {
-                ...service,
+            return Object.assign({}, service, {
                 people: _.chain(people).indexBy('id').pick(service.people).values().value()
-            };
+            });
         });
     },
     getTeamsData: () => {
