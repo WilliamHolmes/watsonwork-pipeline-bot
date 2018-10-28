@@ -1,5 +1,3 @@
-const _ = require('underscore');
-
 const constants = {
     SERVICE: 'service',
     GIT_REPO: 'https://github.ibm.com/toscana',
