@@ -13,7 +13,7 @@ const API = require('./api');
 
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
-const getCard = data => {
+const serviceCard = data => {
     const { id, name = '', description, people = [] } = data;
     const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
     const actionId = `${constants.ACTION_GET_DETAILS}${id}`;
@@ -21,14 +21,30 @@ const getCard = data => {
     return UI.card(description, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 }
 
-const getCards = services => _.chain(services).sort('description').map(getCard).value();
+const repositoryCard = data => {
+    const { id, name, projectsUrl, updatedAt } = data;
+    const subTitle = constants.LAST_UPDATED;
+    const actionId = `${constants.ACTION_GET_COMMITTERS}${id}`;
+    const date = new Date(updatedAt).getTime();
+    return UI.card(name, subTitle, projectsUrl, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
+}
+
+const getCards = (data, sortBy, cardType) => _.chain(data).sort(sortBy).map(cardType).value();
 
 const serviceNotFound = (serviceName, message, annotation) => {
     app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.SERVICE_NOT_FOUND, `${serviceName} - not found.`))
 }
 
+const repositoryNotFound = (repository, message, annotation) => {
+    app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.REPOSITORY_NOT_FOUND, `${repository} - not found.`))
+}
+
 const serviceFound = (message, annotation, services) => {
-    app.sendTargetedMessage(message.userId, annotation, getCards(services));
+    app.sendTargetedMessage(message.userId, annotation, getCards(services, 'description', serviceCard));
+}
+
+const repositoryFound = (message, annotation, repositories) => {
+    app.sendTargetedMessage(message.userId, annotation, getCards(repositories, 'name', repositoryCard));
 }
 
 const getContacts = people => {
@@ -99,8 +115,12 @@ const findCommitters = (message, annotation, params) => {
     const { userId } = message;
     API.getRepository(repository).then(repositories => {
         console.log('TCL: findCommitters -> repositories', repositories);
-        app.sendTargetedMessage(userId, annotation, UI.generic('test', JSON.stringify(repositories), []));
-    });
+        // app.sendTargetedMessage(userId, annotation, UI.generic('test', JSON.stringify(repositories), []));
+        if (_.isEmpty(repositories)) {
+            throw new Error('Repository Not found');
+        }
+        repositoryFound(message, annotation, services);
+    }).catch(() => repositoryNotFound(repository, message, annotation));
 }
 
 const findService = (message, annotation, params) => {

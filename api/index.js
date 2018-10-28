@@ -34,7 +34,7 @@ const api = {
     },
     getTeamsData: () => {
         console.log('TCL: getTeamsData');
-        return fetch('https://github.ibm.com/api/graphql', {
+        return fetch(constants.GIT_GQL, {
             method: 'POST',
             body: JSON.stringify({ query }),
             headers: {

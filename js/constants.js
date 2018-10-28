@@ -1,17 +1,22 @@
 const constants = {
     SERVICE: 'service',
     GIT_REPO: 'https://github.ibm.com/toscana',
+    GIT_GQL: 'https://github.ibm.com/api/graphql',
     SERVICE_NOT_FOUND: '404 - Service Not Found',
+    REPOSITORY_NOT_FOUND: '404 - Repository Not Found',
     search: {
         REPOSITORY_KEYS: ['name'],
         SERVICE_KEYS: ['description', 'name', 'repo'],
         OPTIONS: { caseSensitive: false, sort: true }
     },
     ACTION_GET_DETAILS: 'workspace-pipeline-helper-get-service|',
+    ACTION_GET_COMMITTERS: 'workspace-pipeline-helper-get-committers|',
     ACTION_SHARE_DETAILS: 'workspace-pipeline-helper-share-service|',
     SERVICE_SHARED: 'Service - Shared With Space',
+    LAST_UPDATED: 'Last Updated',
     buttons: {
         SERVICE_DETAILS: 'Get Service Details',
+        GET_COMMITTERS: 'Get Committers Group',
         SHARE_DETAILS: 'Share with Space'
     },
     annotations: {
