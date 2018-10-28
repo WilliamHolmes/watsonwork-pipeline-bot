@@ -119,7 +119,7 @@ const findCommitters = (message, annotation, params) => {
         if (_.isEmpty(repositories)) {
             throw new Error('Repository Not found');
         }
-        repositoryFound(message, annotation, services);
+        repositoryFound(message, annotation, repositories);
     }).catch(() => repositoryNotFound(repository, message, annotation));
 }
 
