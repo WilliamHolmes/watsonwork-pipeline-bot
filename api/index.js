@@ -53,7 +53,7 @@ const api = {
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ repositories }) => {
             console.log('TCL: getRepositories repositories', repositories);
             if (_.isEmpty(repositories)) {
-                return api.getTeamsData().then(updateRepositories);
+                return api.getTeamsData().then(api.updateRepositories);
             }
             return repositories;
         });
