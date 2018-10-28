@@ -7,7 +7,6 @@ const member = new schema.Entity('members');
 const repository = new schema.Entity('repositories');
 const team = new schema.Entity('teams');
 
-
 teams.define({
     items: [team]
 });
@@ -40,7 +39,5 @@ const process = obj => {
     const { entities } = normalize({ id, items }, teams, { mergeIntoEntity });
     return _.omit(entities, ['_root']);
 };
-
-const process = obj => obj;
 
 module.exports = process;

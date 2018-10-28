@@ -1,5 +1,4 @@
 const Cloudant = require('cloudant');
-const constants = require('../js/constants');
 
 const { env: { CLOUDANT_URL, CLOUDANT_DB, VCAP_SERVICES } } = process;
 

@@ -31,17 +31,6 @@ const serviceFound = (message, annotation, services) => {
     app.sendTargetedMessage(message.userId, annotation, getCards(services));
 }
 
-const findService = (message, annotation, params) => {
-    const serviceName = _.first(params);
-    console.log('TCL: findService -> serviceName', serviceName);
-    API.getService(serviceName).then(services => {
-        if (_.isEmpty(services)) {
-            throw new Error('Service Not found');
-        }
-        serviceFound(message, annotation, services);
-    }).catch(() => serviceNotFound(serviceName, message, annotation));
-}
-
 const getContacts = people => {
     return _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
 }
@@ -112,6 +101,17 @@ const findCommitters = (message, annotation, params) => {
         console.log('TCL: findCommitters -> repositories', repositories);
         app.sendTargetedMessage(userId, annotation, UI.generic('test', JSON.stringify(repositories), []));
     });
+}
+
+const findService = (message, annotation, params) => {
+    const serviceName = _.first(params);
+    console.log('TCL: findService -> serviceName', serviceName);
+    API.getService(serviceName).then(services => {
+        if (_.isEmpty(services)) {
+            throw new Error('Service Not found');
+        }
+        serviceFound(message, annotation, services);
+    }).catch(() => serviceNotFound(serviceName, message, annotation));
 }
 
 app.on('actionSelected:/service', findService);

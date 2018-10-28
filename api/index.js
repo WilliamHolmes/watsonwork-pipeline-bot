@@ -38,7 +38,7 @@ const api = {
             method: 'POST',
             body: JSON.stringify({ query }),
             headers: {
-                'Content-Type': 'applciation/json',
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${process.env.GIT_TOSCANA_TOKEN}`
             }
         }).then(res => res.json());
