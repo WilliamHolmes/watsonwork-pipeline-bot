@@ -47,7 +47,7 @@ const db = {
     updateDOC: (key, data) => {
         console.log('updateDOC: key, data', key, data);
         return db.getDOC(key).then(doc => {
-            const newDoc = Object.assign({}, doc, data);
+            const newDoc = { ...doc, ...data };
             return db.getDB().insert(newDoc, (err, data) => {
             console.log('DB INSERT: err, data', err, data);
                 if (data && data.rev) {

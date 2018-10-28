@@ -23,11 +23,6 @@
     "watsonworkspace-ngrok": "^1.0.0"
   },
   "dependencies": {
-    "babel-core": "6.26.0",
-    "babel-eslint": "8.2.2",
-    "babel-loader": "7.1.4",
-    "babel-preset-es2015": "6.24.1",
-    "babel-preset-stage-0": "6.24.1",
     "cloudant": "1.10.0-NOTICE",
     "dotenv": "^4.0.0",
     "fuzzy-search": "^2.1.0",
