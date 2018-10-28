@@ -15,6 +15,8 @@ const query = `query {
           nodes {
             id
             name
+            projectsUrl
+            updatedAt
           }
         }
       }
