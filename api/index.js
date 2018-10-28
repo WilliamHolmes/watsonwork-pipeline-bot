@@ -33,7 +33,6 @@ const api = {
         });
     },
     getTeamsData: () => {
-        console.log('TCL: getTeamsData');
         return fetch(constants.GIT_GQL, {
             method: 'POST',
             body: JSON.stringify({ query }),
@@ -49,9 +48,7 @@ const api = {
         });
     },
     getRepositories: () => {
-        console.log('TCL: getRepositories');
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ repositories }) => {
-            console.log('TCL: getRepositories repositories', repositories);
             if (_.isEmpty(repositories)) {
                 return api.getTeamsData().then(api.updateRepositories);
             }
@@ -59,10 +56,9 @@ const api = {
         });
     },
     updateRepositories: obj => {
-        console.log('updateRepositories: obj', obj);
         return db.updateDOC(constants.db.DOCS.TEAMS, normalize(obj));
     },
-    getCommitterGroups: repositoryId => {
+    getCommitterTeams: repositoryId => {
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ teams }) => {
             return _.chain(teams)
                 .values()

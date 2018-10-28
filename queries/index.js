@@ -4,6 +4,7 @@ const query = `query {
       nodes {
         id
         name
+        updatedAt
         members(first: 100) {
           nodes {
             id

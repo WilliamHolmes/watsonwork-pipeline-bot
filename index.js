@@ -29,6 +29,16 @@ const repositoryCard = data => {
     return UI.card(name, subTitle, projectsUrl, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
 }
 
+const teamCard = data => {
+    const { id, members, name, updatedAt } = data;
+    const subTitle = constants.LAST_UPDATED;
+    const actionId = `${constants.ACTION_SHARE_TEAM_DETAILS}${id}|${name}`;
+    const date = new Date(updatedAt).getTime();
+    const body = `${members.length} member${people.length == 1 ? '' : 's'}`;
+    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.SHARE_DETAILS, actionId)], date);
+}
+
+
 const getCards = (data, sortKey, cardType) => _.chain(data).sortBy(sortKey).map(cardType).value();
 
 const serviceNotFound = (serviceName, message, annotation) => {
@@ -39,7 +49,7 @@ const repositoryNotFound = (repository, message, annotation) => {
     app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.REPOSITORY_NOT_FOUND, `${repository} - not found.`))
 }
 
-const committersNotFound = (committers, message, annotation) => {
+const teamsNotFound = (committers, message, annotation) => {
     app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.COMMITTERS_NOT_FOUND, `${committers} - not found.`))
 }
 
@@ -49,6 +59,10 @@ const serviceFound = (message, annotation, services) => {
 
 const repositoryFound = (message, annotation, repositories) => {
     app.sendTargetedMessage(message.userId, annotation, getCards(repositories, 'name', repositoryCard));
+}
+
+const teamsFound = (message, annotation, teams) => {
+    app.sendTargetedMessage(message.userId, annotation, getCards(teams, 'name', teamCard));
 }
 
 const getContacts = people => {
@@ -102,15 +116,14 @@ const onShareServiceDetails = (message, annotation) => {
 };
 
 const onGetCommitters = (message, annotation) => {
-    const { userId } = message;
     const { actionId = '' } = annotation;
     const [repositoryId, repositoryName] = strings.chompLeft(actionId, constants.ACTION_GET_COMMITTERS).split('|');
-    API.getCommitterGroups(repositoryId).then(teams => {
+    API.getCommitterTeams(repositoryId).then(teams => {
         if (_.isEmpty(teams)) {
-            throw new Error('Committer Group Not found');
+            throw new Error('Committer Teams Not found');
         }
-        app.sendTargetedMessage(userId, annotation, UI.generic(JSON.stringify(teams), 'test'));
-    }).catch(() => committersNotFound(repositoryName, message, annotation));
+        teamsFound(message, annotation, teams);
+    }).catch(() => teamsNotFound(repositoryName, message, annotation));
 }
 
 const onActionSelected = (message, annotation) => {
