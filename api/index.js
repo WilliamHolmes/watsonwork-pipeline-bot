@@ -1,5 +1,6 @@
 const _ = require('underscore');
 const Q = require('q');
+const fetch = require('node-fetch');
 
 const db = require('../db');
 
