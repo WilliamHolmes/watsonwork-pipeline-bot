@@ -29,7 +29,7 @@ const repositoryCard = data => {
     return UI.card(name, subTitle, projectsUrl, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
 }
 
-const getCards = (data, sortBy, cardType) => _.chain(data).sort(sortBy).map(cardType).value();
+const getCards = (data, sortKey, cardType) => _.chain(data).sort(sortKey).map(cardType).value();
 
 const serviceNotFound = (serviceName, message, annotation) => {
     app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.SERVICE_NOT_FOUND, `${serviceName} - not found.`))
@@ -112,15 +112,15 @@ const onActionSelected = (message, annotation) => {
 const findCommitters = (message, annotation, params) => {
     const repository = _.first(params);
     console.log('TCL: findCommitters -> repository', repository);
-    const { userId } = message;
     API.getRepository(repository).then(repositories => {
-        console.log('TCL: findCommitters -> repositories', repositories);
-        // app.sendTargetedMessage(userId, annotation, UI.generic('test', JSON.stringify(repositories), []));
         if (_.isEmpty(repositories)) {
             throw new Error('Repository Not found');
         }
         repositoryFound(message, annotation, repositories);
-    }).catch(() => repositoryNotFound(repository, message, annotation));
+    }).catch(err => {
+        console.error('ERROR findCommitters', err);
+        repositoryNotFound(repository, message, annotation)
+    });
 }
 
 const findService = (message, annotation, params) => {
