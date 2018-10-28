@@ -1,20 +1,20 @@
 const _ = require('underscore');
-const { normalize, Schema, arrayOf } = require('normalizr');
+const { normalize, schema } = require('normalizr');
 
-const teams = new Schema('_root');
+const teams = new schema.Entity('_root');
 
-const member = new Schema('members');
-const repository = new Schema('repositories');
-const team = new Schema('teams');
+const member = new schema.Entity('members');
+const repository = new schema.Entity('repositories');
+const team = new schema.Entity('teams');
 
 
 teams.define({
-    items: arrayOf(team)
+    items: [team]
 });
 
 team.define({
-    members: arrayOf(member),
-    repositories: arrayOf(repository)
+    members: [member],
+    repositories: [repository]
 });
 
 const mergeIntoEntity = (entityA, entityB) => {
@@ -26,7 +26,7 @@ const mergeIntoEntity = (entityA, entityB) => {
     }
 };
 
-export default obj => {
+const process = obj => {
     const id = _.now();
     const { data: { organization: { teams: { nodes } } } } = obj;
     const items = _.map(nodes, node => {
@@ -36,3 +36,5 @@ export default obj => {
     const { entities } = normalize({ id, items }, teams, { mergeIntoEntity });
     return _.omit(entities, ['_root']);
 };
+
+module.exports = process;

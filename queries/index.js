@@ -1,4 +1,4 @@
-export default `query {
+const query = `query {
   organization(login:"toscana"){
     teams(first:100){
       nodes{
@@ -18,3 +18,5 @@ export default `query {
     }
   }
 }`
+
+module.exports = query;

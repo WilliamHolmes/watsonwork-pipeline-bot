@@ -46,9 +46,9 @@ const db = {
         })
     },
     insert: (key, onInsert, onRevert) => {
-        db.getDOC(key).then(doc => {
+        return db.getDOC(key).then(doc => {
             doc = onInsert(doc);
-            db.getDB().insert(doc, (err, data) => {
+            return db.getDB().insert(doc, (err, data) => {
                 if (data && data.rev) {
                     doc._rev = data.rev;
                 }

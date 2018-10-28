@@ -45,7 +45,7 @@ const api = {
     getRepository: name => {
         return api.getRepositories().then(repositories => {
             return search(_.values(repositories), name, constants.search.REPOSITORY_KEYS)
-        })
+        });
     },
     getRepositories: () => {
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ repositories }) => {
