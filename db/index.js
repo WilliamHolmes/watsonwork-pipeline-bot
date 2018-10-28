@@ -45,25 +45,26 @@ const db = {
             }
         })
     },
-    updateDOC: (key, data) => {
-        console.log('updateDOC: key, data', key, data);
-        return db.getDOC(key).then(doc => {
-            const newDoc = { ...doc, ...data };
-            return db.getDB().insert(newDoc, (err, data) => {
-            console.log('DB INSERT: err, data', err, data);
-                if (data && data.rev) {
-                    newDoc._rev = data.rev;
-                }
-                if (err) {
-                    newDoc = doc;
-                    console.log('DB INSERT ERROR', err);
-                } else {
-                    console.log('DB INSERT OK');
-                }
-                return db.docs.setDoc(key, newDoc);
-            });
-        });
-    }
+    updateDOC: (key, data) => data
+    // updateDOC: (key, data) => {
+    //     console.log('updateDOC: key, data', key, data);
+    //     return db.getDOC(key).then(doc => {
+    //         const newDoc = { ...doc, ...data };
+    //         return db.getDB().insert(newDoc, (err, data) => {
+    //         console.log('DB INSERT: err, data', err, data);
+    //             if (data && data.rev) {
+    //                 newDoc._rev = data.rev;
+    //             }
+    //             if (err) {
+    //                 newDoc = doc;
+    //                 console.log('DB INSERT ERROR', err);
+    //             } else {
+    //                 console.log('DB INSERT OK');
+    //             }
+    //             return db.docs.setDoc(key, newDoc);
+    //         });
+    //     });
+    // }
 }
 
 module.exports = db;
