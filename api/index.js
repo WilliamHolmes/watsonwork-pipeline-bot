@@ -56,8 +56,10 @@ const api = {
         });
     },
     updateRepositories: data => {
-        const repositories = normalize(data);
-        return db.insert(constants.db.DOCS.TEAMS, doc => ({ ...doc, ...repositories }), doc => doc).then(() => repositories);
+        const obj = normalize(data);
+        return db.getDOC(constants.db.DOCS.TEAMS).then(doc => {
+            return db.insert(doc, obj).then(() => obj);
+        });
     }
 }
 

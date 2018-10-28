@@ -1,5 +1,4 @@
 const Cloudant = require('cloudant');
-const constants = require('../js/constants');
 
 const { env: { CLOUDANT_URL, CLOUDANT_DB, VCAP_SERVICES } } = process;
 
@@ -45,6 +44,21 @@ const db = {
             }
         })
     },
+    insert: (doc, data) => {
+        const obj = { ...doc, ...data };
+        return db.getDB().insert(obj, (err, data) => {
+            if (data && data.rev) {
+                obj._rev = data.rev;
+            }
+            if (err) {
+                obj = doc;
+                console.log('DB INSERT ERROR', err);
+            } else {
+                console.log('DB INSERT OK');
+            }
+            db.docs.setDoc(key, obj);
+        });
+    }/* ,
     insert: (key, onInsert, onRevert) => {
         return db.getDOC(key).then(doc => {
             doc = onInsert(doc);
@@ -61,7 +75,7 @@ const db = {
                 db.docs.setDoc(key, doc);
             });
         });
-    }
+    } */
 }
 
 module.exports = db;

@@ -17,7 +17,7 @@ const constants = {
         SHARE_DETAILS: 'Share with Space'
     },
     annotations: {
-        GENERIC: { type: 'generic', version: '1', color: '#C12228' },
+        GENERIC: { type: 'generic', version: '1', color: '#C12228' }
     },
     db: {
         NAME: 'pipeline',
