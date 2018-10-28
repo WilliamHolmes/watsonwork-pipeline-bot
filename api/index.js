@@ -61,6 +61,14 @@ const api = {
     updateRepositories: obj => {
         console.log('updateRepositories: obj', obj);
         return db.updateDOC(constants.db.DOCS.TEAMS, normalize(obj));
+    },
+    getCommitterGroups: repositoryId => {
+        return db.getDOC(constants.db.DOCS.TEAMS).then(({ teams }) => {
+            return _.chain(teams)
+                .values()
+                .filter(({ repositories }) => _.contains(repositories, repositoryId))
+                .value();
+        });
     }
 }
 

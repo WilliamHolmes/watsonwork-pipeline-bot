@@ -24,7 +24,7 @@ const serviceCard = data => {
 const repositoryCard = data => {
     const { id, name, projectsUrl, updatedAt } = data;
     const subTitle = constants.LAST_UPDATED;
-    const actionId = `${constants.ACTION_GET_COMMITTERS}${id}`;
+    const actionId = `${constants.ACTION_GET_COMMITTERS}${id}|${name}`;
     const date = new Date(updatedAt).getTime();
     return UI.card(name, subTitle, projectsUrl, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
 }
@@ -37,6 +37,10 @@ const serviceNotFound = (serviceName, message, annotation) => {
 
 const repositoryNotFound = (repository, message, annotation) => {
     app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.REPOSITORY_NOT_FOUND, `${repository} - not found.`))
+}
+
+const committersNotFound = (committers, message, annotation) => {
+    app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.COMMITTERS_NOT_FOUND, `${committers} - not found.`))
 }
 
 const serviceFound = (message, annotation, services) => {
@@ -97,6 +101,18 @@ const onShareServiceDetails = (message, annotation) => {
     }).catch(() => serviceNotFound(name, message, annotation));
 };
 
+const onGetCommitters = (message, annotation) => {
+    const { userId } = message;
+    const { actionId = '' } = annotation;
+    const [repositoryId, repositoryName] = strings.chompLeft(actionId, constants.ACTION_GET_COMMITTERS).split('|');
+    API.getCommitterGroups(repositoryId).then(teams => {
+        if (_.isEmpty(teams)) {
+            throw new Error('Committer Group Not found');
+        }
+        app.sendTargetedMessage(userId, annotation, UI.generic(JSON.stringify(teams), 'test'));
+    }).catch(() => committersNotFound(repositoryName, message, annotation));
+}
+
 const onActionSelected = (message, annotation) => {
     const { actionId = '' } = annotation;
     switch(true) {
@@ -104,6 +120,8 @@ const onActionSelected = (message, annotation) => {
             return onGetServiceDetails(message, annotation);
         case actionId.startsWith(constants.ACTION_SHARE_DETAILS):
             return onShareServiceDetails(message, annotation);
+        case actionId.startsWith(constants.ACTION_GET_COMMITTERS):
+            return onGetCommitters(message, annotation);
         default:
             return;
     }
@@ -117,10 +135,7 @@ const findCommitters = (message, annotation, params) => {
             throw new Error('Repository Not found');
         }
         repositoryFound(message, annotation, repositories);
-    }).catch(err => {
-        console.error('ERROR findCommitters', err);
-        repositoryNotFound(repository, message, annotation)
-    });
+    }).catch(() => repositoryNotFound(repository, message, annotation));
 }
 
 const findService = (message, annotation, params) => {

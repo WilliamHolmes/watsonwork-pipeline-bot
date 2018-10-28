@@ -1,9 +1,11 @@
 const constants = {
     SERVICE: 'service',
+    COMMITTERS_GROUP: 'Committers Group',
     GIT_REPO: 'https://github.ibm.com/toscana',
     GIT_GQL: 'https://github.ibm.com/api/graphql',
     SERVICE_NOT_FOUND: '404 - Service Not Found',
     REPOSITORY_NOT_FOUND: '404 - Repository Not Found',
+    COMMITTERS_NOT_FOUND: '404 - Committers Group Not Found',
     search: {
         REPOSITORY_KEYS: ['name'],
         SERVICE_KEYS: ['description', 'name', 'repo'],
@@ -16,7 +18,7 @@ const constants = {
     LAST_UPDATED: 'Last Updated',
     buttons: {
         SERVICE_DETAILS: 'Get Service Details',
-        GET_COMMITTERS: 'Get Committers Group',
+        GET_COMMITTERS: 'Get Committer Groups',
         SHARE_DETAILS: 'Share with Space'
     },
     annotations: {
