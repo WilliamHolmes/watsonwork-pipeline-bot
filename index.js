@@ -32,10 +32,10 @@ const repositoryCard = data => {
 const teamCard = data => {
     const { id, members, name, updatedAt } = data;
     const subTitle = constants.LAST_UPDATED;
-    const actionId = `${constants.ACTION_SHARE_TEAM_DETAILS}${id}|${name}`;
+    const actionId = `${constants.ACTION_GET_TEAM_MEMBERS}${id}|${name}`;
     const date = new Date(updatedAt).getTime();
     const body = `${members.length} committer${members.length == 1 ? '' : 's'}`;
-    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.SHARE_DETAILS, actionId)], date);
+    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.GET_TEAM_MEMBERS, actionId)], date);
 }
 
 

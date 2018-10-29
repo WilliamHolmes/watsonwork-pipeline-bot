@@ -15,11 +15,13 @@ const constants = {
     ACTION_GET_COMMITTERS: 'workspace-pipeline-helper-get-committers|',
     ACTION_SHARE_DETAILS: 'workspace-pipeline-helper-share-service|',
     ACTION_SHARE_TEAM_DETAILS: 'workspace-pipeline-helper-share-team|',
+    ACTION_GET_TEAM_MEMBERS: 'workspace-pipeline-helper-get-members|',
     SERVICE_SHARED: 'Service - Shared With Space',
     LAST_UPDATED: 'Last Updated',
     buttons: {
         SERVICE_DETAILS: 'Get Service Details',
         GET_COMMITTERS: 'Get Committer Teams',
+        GET_TEAM_MEMBERS: 'Get Team Members',
         SHARE_DETAILS: 'Share with Space'
     },
     annotations: {
