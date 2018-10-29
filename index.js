@@ -33,12 +33,11 @@ const teamCard = data => {
     const { id, members, name, updatedAt } = data;
     console.log('TCL: teamCard');
     const subTitle = constants.LAST_UPDATED;
-    const actionId = `${constants.ACTION_GET_TEAM_MEMBERS}${id}|${name}`;
-    const shareActionId = `${constants.ACTION_SHARE_TEAM_DETAILS}${id}|${name}`;
+    const actionId = `${constants.ACTION_VIEW_COMMITTERS}${id}|${name}`;
     const date = new Date(updatedAt).getTime();
     const body = `${members.length} committer${members.length === 1 ? '' : 's'}`;
     console.log('TCL: name, subTitle, body', name, subTitle, body);
-    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.GET_TEAM_MEMBERS, actionId), UI.cardButton(constants.buttons.SHARE_DETAILS, shareActionId)], date);
+    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.VIEW_COMMITTERS, actionId)], date);
 }
 
 
@@ -127,7 +126,7 @@ const onShareServiceDetails = (message, annotation) => {
 
 const onShareTeamDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
-    const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_SHARE_TEAM_DETAILS);
+    const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_SHARE_TEAM_COMMITTERS);
     API.getTeam(teamId).then(team => {
         const { spaceId } = message;
         const { name, members } = team;
@@ -165,7 +164,7 @@ const onActionSelected = (message, annotation) => {
         case actionId.startsWith(constants.ACTION_GET_COMMITTERS):
             console.log('TCL: onActionSelected ACTION_GET_COMMITTERS');
             return onGetCommitters(message, annotation);
-        case actionId.startsWith(constants.ACTION_SHARE_TEAM_DETAILS):
+        case actionId.startsWith(constants.ACTION_SHARE_TEAM_COMMITTERS):
             return onShareTeamDetails(message, annotation);
         default:
             return;
