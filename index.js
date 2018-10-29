@@ -22,11 +22,11 @@ const serviceCard = data => {
 }
 
 const repositoryCard = data => {
-    const { id, name, projectsUrl, updatedAt } = data;
+    const { id, name, url, updatedAt } = data;
     const subTitle = constants.LAST_UPDATED;
     const actionId = `${constants.ACTION_GET_COMMITTERS}${id}|${name}`;
     const date = new Date(updatedAt).getTime();
-    return UI.card(name, subTitle, projectsUrl, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
+    return UI.card(name, subTitle, url, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
 }
 
 const teamCard = data => {

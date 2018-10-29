@@ -5,6 +5,7 @@ const query = `query {
         id
         name
         updatedAt
+        url
         members(first: 100) {
           nodes {
             id
@@ -16,7 +17,7 @@ const query = `query {
           nodes {
             id
             name
-            projectsUrl
+            url
             updatedAt
           }
         }
