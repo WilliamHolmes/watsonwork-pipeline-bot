@@ -33,9 +33,10 @@ const teamCard = data => {
     const { id, members, name, updatedAt } = data;
     const subTitle = constants.LAST_UPDATED;
     const actionId = `${constants.ACTION_GET_TEAM_MEMBERS}${id}|${name}`;
+    const shareActionId = `${constants.ACTION_SHARE_TEAM_DETAILS}${id}|${name}`;
     const date = new Date(updatedAt).getTime();
     const body = `${members.length} committer${members.length == 1 ? '' : 's'}`;
-    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.GET_TEAM_MEMBERS, actionId)], date);
+    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.GET_TEAM_MEMBERS, actionId), UI.button(shareActionId, constants.buttons.SHARE_DETAILS)], date);
 }
 
 
@@ -121,6 +122,20 @@ const onShareServiceDetails = (message, annotation) => {
     });
 };
 
+const onShareTeamDetails = (message, annotation) => {
+    const { actionId = '' } = annotation;
+    const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_SHARE_TEAM_DETAILS);
+    API.getTeam(teamId).then(team => {
+        const { spaceId } = message;
+        const { name, updatedAt, members } = team;
+        const text = JSON.stringify(members);
+        sendGenericAnnotation(spaceId, name, text, constants.REPOSITORY_COMMITTERS);
+    }).catch(err => {
+        console.error('[ERROR] onGetCommitters', err);
+        teamsNotFound(teamName, message, annotation);
+    });
+}
+
 const onGetCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [repositoryId, repositoryName] = strings.chompLeft(actionId, constants.ACTION_GET_COMMITTERS).split('|');
@@ -144,6 +159,8 @@ const onActionSelected = (message, annotation) => {
             return onShareServiceDetails(message, annotation);
         case actionId.startsWith(constants.ACTION_GET_COMMITTERS):
             return onGetCommitters(message, annotation);
+        case actionId.startsWith(constants.ACTION_SHARE_TEAM_DETAILS):
+            return onShareTeamDetails(message, annotation);
         default:
             return;
     }

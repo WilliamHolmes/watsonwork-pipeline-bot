@@ -65,6 +65,16 @@ const api = {
                 .filter(({ repositories }) => _.contains(repositories, repositoryId))
                 .value();
         });
+    },
+    getTeam: teamId => {
+        return db.getDOC(constants.db.DOCS.TEAMS).then(({ members, teams }) => {
+            const team = teams[teamId];
+            if (_.isEmpty(team)) {
+                return;
+            }
+            const members = _.pick(members, team.members).values();
+            return { ...team, members };
+        });
     }
 }
 
