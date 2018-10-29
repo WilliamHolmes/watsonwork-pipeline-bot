@@ -67,13 +67,13 @@ const api = {
         });
     },
     getTeam: teamId => {
-        return db.getDOC(constants.db.DOCS.TEAMS).then(({ members, teams }) => {
+        return db.getDOC(constants.db.DOCS.TEAMS).then(({ members: allMembers, teams }) => {
             const team = teams[teamId];
             if (_.isEmpty(team)) {
                 return;
             }
-            const members = _.chain(members).pick(team.members).values().value();
-            return { ...team, members };
+            const members = _.chain(allMembers).pick(team.members).values().value();
+            return Object.assign({}, team, { members });
         });
     }
 }
