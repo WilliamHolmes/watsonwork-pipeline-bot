@@ -34,7 +34,7 @@ const teamCard = data => {
     const subTitle = constants.LAST_UPDATED;
     const actionId = `${constants.ACTION_SHARE_TEAM_DETAILS}${id}|${name}`;
     const date = new Date(updatedAt).getTime();
-    const body = `${members.length} member${people.length == 1 ? '' : 's'}`;
+    const body = `${members.length} committer${members.length == 1 ? '' : 's'}`;
     return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.SHARE_DETAILS, actionId)], date);
 }
 
