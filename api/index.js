@@ -72,7 +72,7 @@ const api = {
             if (_.isEmpty(team)) {
                 return;
             }
-            const members = _.pick(members, team.members).values();
+            const members = _.chain(members).pick(team.members).values().value();
             return { ...team, members };
         });
     }
