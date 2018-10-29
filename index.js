@@ -31,12 +31,13 @@ const repositoryCard = data => {
 
 const teamCard = data => {
     const { id, members, name, updatedAt } = data;
-    console.log('TCL: teamCard data', data);
+    console.log('TCL: teamCard');
     const subTitle = constants.LAST_UPDATED;
     const actionId = `${constants.ACTION_GET_TEAM_MEMBERS}${id}|${name}`;
     const shareActionId = `${constants.ACTION_SHARE_TEAM_DETAILS}${id}|${name}`;
     const date = new Date(updatedAt).getTime();
     const body = `${members.length} committer${members.length == 1 ? '' : 's'}`;
+    console.log('TCL: name, subTitle, body', name, subTitle, body);
     return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.GET_TEAM_MEMBERS, actionId), UI.button(constants.buttons.SHARE_DETAILS, shareActionId)], date);
 }
 
@@ -64,7 +65,7 @@ const repositoryFound = (message, annotation, repositories) => {
 }
 
 const teamsFound = (message, annotation, teams) => {
-    console.log('TCL: teamsFound -> teams', teams);
+    console.log('TCL: teamsFound');
     app.sendTargetedMessage(message.userId, annotation, getCards(teams, 'name', teamCard));
 }
 
@@ -141,9 +142,9 @@ const onShareTeamDetails = (message, annotation) => {
 const onGetCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [repositoryId, repositoryName] = strings.chompLeft(actionId, constants.ACTION_GET_COMMITTERS).split('|');
-    console.log('TCL: onGetCommitters -> repositoryId, repositoryName', repositoryId, repositoryName);
+    console.log('TCL: onGetCommitters -> repositoryId, repositoryName');
     API.getCommitterTeams(repositoryId).then(teams => {
-        console.log('TCL: onGetCommitters -> teams', teams);
+        console.log('TCL: onGetCommitters');
         if (_.isEmpty(teams)) {
             throw new Error('Committer Teams Not found');
         }
@@ -162,6 +163,7 @@ const onActionSelected = (message, annotation) => {
         case actionId.startsWith(constants.ACTION_SHARE_DETAILS):
             return onShareServiceDetails(message, annotation);
         case actionId.startsWith(constants.ACTION_GET_COMMITTERS):
+            console.log('TCL: onActionSelected ACTION_GET_COMMITTERS');
             return onGetCommitters(message, annotation);
         case actionId.startsWith(constants.ACTION_SHARE_TEAM_DETAILS):
             return onShareTeamDetails(message, annotation);

@@ -8,6 +8,7 @@ const query = require('../queries');
 
 const constants = require('../js/constants');
 const search = require('../js/search');
+const strings = require('../js/strings');
 const normalize = require('../js/normalize');
 
 const api = {
@@ -63,6 +64,7 @@ const api = {
             return _.chain(teams)
                 .values()
                 .filter(({ repositories }) => _.contains(repositories, repositoryId))
+                .filter(({ name }) => strings.endsWith(name, constants.COMMITTERS_GROUP))
                 .value();
         });
     },
