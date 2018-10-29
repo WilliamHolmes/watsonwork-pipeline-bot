@@ -15,7 +15,7 @@ app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
 const serviceCard = data => {
     const { id, name = '', description, people = [] } = data;
-    const subTitle = `${people.length} contact${people.length == 1 ? '' : 's'}`;
+    const subTitle = `${people.length} contact${people.length === 1 ? '' : 's'}`;
     const actionId = `${constants.ACTION_GET_DETAILS}${id}`;
     const date = (_.now() - 60000);
     return UI.card(description, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
@@ -36,7 +36,7 @@ const teamCard = data => {
     const actionId = `${constants.ACTION_GET_TEAM_MEMBERS}${id}|${name}`;
     const shareActionId = `${constants.ACTION_SHARE_TEAM_DETAILS}${id}|${name}`;
     const date = new Date(updatedAt).getTime();
-    const body = `${members.length} committer${members.length == 1 ? '' : 's'}`;
+    const body = `${members.length} committer${members.length === 1 ? '' : 's'}`;
     console.log('TCL: name, subTitle, body', name, subTitle, body);
     return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.GET_TEAM_MEMBERS, actionId), UI.button(constants.buttons.SHARE_DETAILS, shareActionId)], date);
 }
@@ -45,15 +45,15 @@ const teamCard = data => {
 const getCards = (data, sortKey, cardType) => _.chain(data).sortBy(sortKey).map(cardType).value();
 
 const serviceNotFound = (serviceName, message, annotation) => {
-    app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.SERVICE_NOT_FOUND, `${serviceName} - not found.`))
+    app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.SERVICE_NOT_FOUND, `${serviceName} - not found.`));
 }
 
 const repositoryNotFound = (repository, message, annotation) => {
-    app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.REPOSITORY_NOT_FOUND, `${repository} - not found.`))
+    app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.REPOSITORY_NOT_FOUND, `${repository} - not found.`));
 }
 
 const teamsNotFound = (committers, message, annotation) => {
-    app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.COMMITTERS_NOT_FOUND, `${committers} - not found.`))
+    app.sendTargetedMessage(message.userId, annotation, UI.generic(constants.COMMITTERS_NOT_FOUND, `${committers} - not found.`));
 }
 
 const serviceFound = (message, annotation, services) => {
@@ -121,7 +121,7 @@ const onShareServiceDetails = (message, annotation) => {
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
     }).catch(err => {
         console.error('[ERROR] onShareServiceDetails', err);
-        serviceNotFound(name, message, annotation)
+        serviceNotFound(name, message, annotation);
     });
 };
 
@@ -130,7 +130,7 @@ const onShareTeamDetails = (message, annotation) => {
     const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_SHARE_TEAM_DETAILS);
     API.getTeam(teamId).then(team => {
         const { spaceId } = message;
-        const { name, updatedAt, members } = team;
+        const { name, members } = team;
         const text = JSON.stringify(members);
         sendGenericAnnotation(spaceId, name, text, constants.REPOSITORY_COMMITTERS);
     }).catch(err => {
@@ -196,7 +196,7 @@ const findService = (message, annotation, params) => {
         serviceFound(message, annotation, services);
     }).catch(err => {
         console.error('[ERROR] findService', err);
-        serviceNotFound(serviceName, message, annotation)
+        serviceNotFound(serviceName, message, annotation);
     });
 }
 
