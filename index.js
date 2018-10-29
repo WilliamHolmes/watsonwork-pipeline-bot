@@ -38,7 +38,7 @@ const teamCard = data => {
     const date = new Date(updatedAt).getTime();
     const body = `${members.length} committer${members.length === 1 ? '' : 's'}`;
     console.log('TCL: name, subTitle, body', name, subTitle, body);
-    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.GET_TEAM_MEMBERS, actionId), UI.button(constants.buttons.SHARE_DETAILS, shareActionId)], date);
+    return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.GET_TEAM_MEMBERS, actionId), UI.cardButton(constants.buttons.SHARE_DETAILS, shareActionId)], date);
 }
 
 
