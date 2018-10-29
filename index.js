@@ -88,7 +88,10 @@ const onGetServiceDetails = (message, annotation) => {
         const shareActionId = `${constants.ACTION_SHARE_DETAILS}${serviceId}`;
         const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
         app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
-    }).catch(() => serviceNotFound(name, message, annotation));
+    }).catch(err => {
+        console.error('[ERROR] onGetServiceDetails', err);
+        serviceNotFound(name, message, annotation);
+    });
 }
 
 const sendGenericAnnotation = (spaceId, title = '', text = '', name = '') =>  {
@@ -112,7 +115,10 @@ const onShareServiceDetails = (message, annotation) => {
 
         sendGenericAnnotation(spaceId, description, text, constants.SERVICE);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
-    }).catch(() => serviceNotFound(name, message, annotation));
+    }).catch(err => {
+        console.error('[ERROR] onShareServiceDetails', err);
+        serviceNotFound(name, message, annotation)
+    });
 };
 
 const onGetCommitters = (message, annotation) => {
@@ -123,7 +129,10 @@ const onGetCommitters = (message, annotation) => {
             throw new Error('Committer Teams Not found');
         }
         teamsFound(message, annotation, teams);
-    }).catch(() => teamsNotFound(repositoryName, message, annotation));
+    }).catch(err => {
+        console.error('[ERROR] onGetCommitters', err);
+        teamsNotFound(repositoryName, message, annotation);
+    });
 }
 
 const onActionSelected = (message, annotation) => {
@@ -148,7 +157,10 @@ const findCommitters = (message, annotation, params) => {
             throw new Error('Repository Not found');
         }
         repositoryFound(message, annotation, repositories);
-    }).catch(() => repositoryNotFound(repository, message, annotation));
+    }).catch(err => {
+        console.error('[ERROR] findCommitters', err);
+        repositoryNotFound(repository, message, annotation);
+    });
 }
 
 const findService = (message, annotation, params) => {
@@ -159,7 +171,10 @@ const findService = (message, annotation, params) => {
             throw new Error('Service Not found');
         }
         serviceFound(message, annotation, services);
-    }).catch(() => serviceNotFound(serviceName, message, annotation));
+    }).catch(err => {
+        console.error('[ERROR] findService', err);
+        serviceNotFound(serviceName, message, annotation)
+    });
 }
 
 app.on('actionSelected:/service', findService);
