@@ -31,6 +31,7 @@ const repositoryCard = data => {
 
 const teamCard = data => {
     const { id, members, name, updatedAt } = data;
+    console.log('TCL: teamCard data', data);
     const subTitle = constants.LAST_UPDATED;
     const actionId = `${constants.ACTION_GET_TEAM_MEMBERS}${id}|${name}`;
     const shareActionId = `${constants.ACTION_SHARE_TEAM_DETAILS}${id}|${name}`;
@@ -63,6 +64,7 @@ const repositoryFound = (message, annotation, repositories) => {
 }
 
 const teamsFound = (message, annotation, teams) => {
+    console.log('TCL: teamsFound -> teams', teams);
     app.sendTargetedMessage(message.userId, annotation, getCards(teams, 'name', teamCard));
 }
 
@@ -139,7 +141,9 @@ const onShareTeamDetails = (message, annotation) => {
 const onGetCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [repositoryId, repositoryName] = strings.chompLeft(actionId, constants.ACTION_GET_COMMITTERS).split('|');
+    console.log('TCL: onGetCommitters -> repositoryId, repositoryName', repositoryId, repositoryName);
     API.getCommitterTeams(repositoryId).then(teams => {
+        console.log('TCL: onGetCommitters -> teams', teams);
         if (_.isEmpty(teams)) {
             throw new Error('Committer Teams Not found');
         }

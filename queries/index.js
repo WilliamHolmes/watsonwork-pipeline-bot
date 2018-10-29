@@ -11,6 +11,7 @@ const query = `query {
             id
             email
             name
+            url
           }
         }
         repositories(first:100){
