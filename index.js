@@ -13,8 +13,6 @@ const API = require('./api');
 
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
-console.log(' **** sendGraphql', !!app.sendGraphql);
-
 const serviceCard = data => {
     const { id, name = '', description, people = [] } = data;
     const subTitle = `${people.length} contact${people.length === 1 ? '' : 's'}`;
@@ -73,8 +71,7 @@ const teamsFound = (message, annotation, teams) => {
 const getContacts = people => {
     return _.chain(people)
         .sortBy('displayName')
-        .sortBy('name')
-        .map(({ id, displayName, name }) => `- <@${id}|${strings.titleCase((displayName || name))}>`)
+        .map(({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`)
         .value()
         .join('\n')
 }
@@ -153,9 +150,12 @@ const onViewCommitters = (message, annotation) => {
         console.log('TCL: onViewCommitters -> team', team.name);
         const { spaceId } = message;
         const { name, members, url } = team;
-        const contacts = getContacts(members);
-        const text = `[Repository URL](${url})\n\nCommitters:\n${contacts}`;
-        sendGenericAnnotation(spaceId, name, text, constants.GIT_REPOSITORY);
+        API.getPeople(app, members).then(people => {
+            console.log('TCL: onViewCommitters API.getPeople -> people', people);
+            const contacts = getContacts(people);
+            const text = `[Repository URL](${url})\n\nCommitters:\n${contacts}`;
+            sendGenericAnnotation(spaceId, name, text, constants.GIT_REPOSITORY);
+        });
     }).catch(err => {
         console.error('[ERROR] onViewCommitters', err);
         teamsNotFound(teamName, message, annotation);

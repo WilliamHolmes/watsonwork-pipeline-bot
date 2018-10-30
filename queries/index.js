@@ -27,7 +27,7 @@ const getTeams = () => `query {
   }
 }`;
 
-const getPeople = people =>  {
+const getPeople = (app, people) =>  {
   let queryList = _.map(people, ({ email }, index) => {
     return `query${index}: {
       person(email: "${email}") {
@@ -37,7 +37,7 @@ const getPeople = people =>  {
       }
     }`;
   });
-  return `query {${queryList}}`;
+  return app.sendGraphql(`query {${queryList}}`);
 }
 
 module.exports = {
