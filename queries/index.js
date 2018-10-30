@@ -27,7 +27,7 @@ const getTeams = () => `query {
   }
 }`;
 
-const getPeople = (app, people) =>  {
+const getPeople = people =>  {
   let queryList = _.map(people, ({ email }, index) => {
     return `query${index}: {
       person(email: "${email}") {
