@@ -31,15 +31,14 @@ const getTeams = () => `query {
 
 const getPeople = people =>  {
   let queryList = _.map(people, ({ email }, index) => {
-    return `query${index}: {
+    return `query${index}:
       person(email: "${email}") {
         id
         email
         displayName
-      }
-    }`;
-  });
-  return `query {${queryList}}`;
+      }`;
+  }).join(' ');
+  return `query: {${queryList}}`;
 }
 
 module.exports = {
