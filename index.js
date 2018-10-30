@@ -140,7 +140,7 @@ const onShareTeamDetails = (message, annotation) => {
 
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
-    const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_VIEW_COMMITTERS);
+    const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_VIEW_COMMITTERS).split('|');
     console.log('TCL: onViewCommitters -> teamId, teamName', teamId, teamName);
     API.getTeam(teamId).then(team => {
         console.log('TCL: onViewCommitters -> team', team.name);
