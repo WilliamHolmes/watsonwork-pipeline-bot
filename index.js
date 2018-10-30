@@ -152,10 +152,10 @@ const onViewCommitters = (message, annotation) => {
     API.getTeam(teamId).then(team => {
         console.log('TCL: onViewCommitters -> team', team.name);
         const { spaceId } = message;
-        const { name, members } = team;
+        const { name, members, url } = team;
         const contacts = getContacts(members);
-        const text = `\ncontacts:\n${contacts}`;
-        sendGenericAnnotation(spaceId, name, text, constants.REPOSITORY_COMMITTERS);
+        const text = `[Repository URL](${url})\n\nCommitters:\n${contacts}`;
+        sendGenericAnnotation(spaceId, name, text, constants.GIT_REPOSITORY);
     }).catch(err => {
         console.error('[ERROR] onViewCommitters', err);
         teamsNotFound(teamName, message, annotation);
