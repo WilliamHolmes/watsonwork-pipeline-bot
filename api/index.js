@@ -82,7 +82,13 @@ const api = {
         });
     },
     getPeople: (app, people) => {
-        return app.sendGraphql(query.getPeople(people)).then(({ data }) => _.values(data));
+        return app.sendGraphql(query.getPeople(people)).then(res => {
+            console.log('TCL: getPeople res', res);
+            return _.values(res.data)
+        }).catch(e => {
+            console.error('[ERROR] TCL: getPeople', e);
+            throw new Error(e);
+        });
     }
 }
 
