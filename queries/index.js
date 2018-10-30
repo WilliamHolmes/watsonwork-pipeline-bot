@@ -37,7 +37,7 @@ const getPeople = (app, people) =>  {
       }
     }`;
   });
-  return app.sendGraphql(`query {${queryList}}`);
+  return `query {${queryList}}`;
 }
 
 module.exports = {

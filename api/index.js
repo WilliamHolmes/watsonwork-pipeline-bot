@@ -81,8 +81,8 @@ const api = {
             return Object.assign({}, team, { members });
         });
     },
-    getPeople: people => {
-        return ww.sendGraphql(query.getPeople(people)).then(({ data }) => _.values(data))
+    getPeople: (app, people) => {
+        return app.sendGraphql(query.getPeople(people)).then(({ data }) => _.values(data));
     }
 }
 
