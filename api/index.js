@@ -69,6 +69,7 @@ const api = {
         });
     },
     getTeam: teamId => {
+        console.log('TCL: getTeam teamId', teamId);
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ members: allMembers, teams }) => {
             const team = teams[teamId];
             console.log('TCL: getTeam team', team);

@@ -149,7 +149,7 @@ const onViewCommitters = (message, annotation) => {
         const text = 'test';
         sendGenericAnnotation(spaceId, name, text, constants.REPOSITORY_COMMITTERS);
     }).catch(err => {
-        console.error('[ERROR] onGetCommitters', err);
+        console.error('[ERROR] onViewCommitters', err);
         teamsNotFound(teamName, message, annotation);
     });
 }
