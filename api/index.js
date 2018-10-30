@@ -82,7 +82,9 @@ const api = {
         });
     },
     getPeople: (app, people) => {
-        return app.sendGraphql(query.getPeople(people)).then(res => {
+        const q = query.getPeople(people);
+        console.log('TCL: getPeople q', q);
+        return app.sendGraphql(q).then(res => {
             console.log('TCL: getPeople res', res);
             return _.values(res.data)
         }).catch(e => {
