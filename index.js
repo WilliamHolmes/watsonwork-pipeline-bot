@@ -150,10 +150,10 @@ const onViewCommitters = (message, annotation) => {
         console.log('TCL: onViewCommitters -> team', team.name);
         const { userId, spaceId } = message;
         const { name, members, url } = team;
-        API.getPeople(app, members).then(people => {
+        return API.getPeople(app, members).then(people => {
             console.log('TCL: onViewCommitters API.getPeople -> people', people);
             const contacts = getContacts(people);
-            const text = `[Repository URL](${url})\n[Members URL](${url}/members)\n\nCommitters:\n${contacts}`;
+            const text = `[Members URL](${url}/members)\n\nCommitters:\n${contacts}`;
             sendGenericAnnotation(spaceId, name, text, constants.GIT_REPOSITORY);
 
             // const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
