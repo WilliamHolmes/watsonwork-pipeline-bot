@@ -72,7 +72,7 @@ const getContacts = people => {
     return _.chain(people)
         .sortBy('displayName')
         .sortBy('name')
-        .map(people, ({ id, displayName, name }) => `- <@${id}|${strings.titleCase((displayName || name))}>`)
+        .map(({ id, displayName, name }) => `- <@${id}|${strings.titleCase((displayName || name))}>`)
         .value()
         .join('\n')
 }
