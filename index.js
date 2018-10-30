@@ -141,10 +141,12 @@ const onShareTeamDetails = (message, annotation) => {
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_VIEW_COMMITTERS);
+    console.log('TCL: onViewCommitters -> teamId, teamName', teamId, teamName);
     API.getTeam(teamId).then(team => {
+        console.log('TCL: onViewCommitters -> team', team.name);
         const { spaceId } = message;
         const { name, members } = team;
-        const text = JSON.stringify(members);
+        const text = 'test';
         sendGenericAnnotation(spaceId, name, text, constants.REPOSITORY_COMMITTERS);
     }).catch(err => {
         console.error('[ERROR] onGetCommitters', err);

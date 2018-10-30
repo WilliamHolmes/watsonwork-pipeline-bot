@@ -71,6 +71,7 @@ const api = {
     getTeam: teamId => {
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ members: allMembers, teams }) => {
             const team = teams[teamId];
+            console.log('TCL: getTeam team', team);
             if (_.isEmpty(team)) {
                 return;
             }
