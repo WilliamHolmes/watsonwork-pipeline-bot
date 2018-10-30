@@ -70,6 +70,7 @@ const teamsFound = (message, annotation, teams) => {
 
 const getContacts = people => {
     return _.chain(people)
+        .compact()
         .filter(person => person.displayName)
         .sortBy('displayName')
         .map(({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`)
