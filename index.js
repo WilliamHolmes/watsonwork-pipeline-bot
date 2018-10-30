@@ -29,11 +29,11 @@ const repositoryCard = data => {
     return UI.card(name, subTitle, url, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
 }
 
-const teamCard = data => {
+const teamCard = (data, repositoryId) => {
     const { id, members, name, updatedAt } = data;
     console.log('TCL: teamCard');
     const subTitle = constants.LAST_UPDATED;
-    const actionId = `${constants.ACTION_VIEW_COMMITTERS}${id}|${name}`;
+    const actionId = `${constants.ACTION_VIEW_COMMITTERS}${id}|${name}|${repositoryId}`;
     const date = new Date(updatedAt).getTime();
     const body = `${members.length} committer${members.length === 1 ? '' : 's'}`;
     console.log('TCL: name, subTitle, body', name, subTitle, body);
@@ -63,9 +63,9 @@ const repositoryFound = (message, annotation, repositories) => {
     app.sendTargetedMessage(message.userId, annotation, getCards(repositories, 'name', repositoryCard));
 }
 
-const teamsFound = (message, annotation, teams) => {
-    console.log('TCL: teamsFound');
-    app.sendTargetedMessage(message.userId, annotation, getCards(teams, 'name', teamCard));
+const teamsFound = (message, annotation, data) => {
+    const { repositoryId, teams } = data;
+    app.sendTargetedMessage(message.userId, annotation, getCards(teams, 'name', card => teamCard(card, repositoryId)));
 }
 
 const getContacts = people => {
@@ -145,19 +145,21 @@ const onShareTeamDetails = (message, annotation) => {
 
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
-    const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_VIEW_COMMITTERS).split('|');
-    console.log('TCL: onViewCommitters -> teamId, teamName', teamId, teamName);
-    API.getTeam(teamId).then(team => {
-        console.log('TCL: onViewCommitters -> team', team.name);
-        const { spaceId } = message;
-        const { name, members } = team;
-        return API.getPeople(app, members).then(people => {
-            const contacts = getContacts(people);
-            const text = `Committers:\n${contacts}`;
-            sendGenericAnnotation(spaceId, name, text, constants.GIT_TEAMS);
-
-            // const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
-            // app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
+    const [teamId, teamName, repositoryId] = strings.chompLeft(actionId, constants.ACTION_VIEW_COMMITTERS).split('|');
+    console.log('TCL: onViewCommitters -> teamId, teamName', teamId, teamName, repositoryId);
+    API.getRepository(repositoryId).then(repository => {
+        return API.getTeam(teamId).then(team => {
+            console.log('TCL: onViewCommitters -> team', team.name);
+            const { spaceId } = message;
+            const { name: repositoryName } = repository;
+            const { name: teamName, members } = team;
+            return API.getPeople(app, members).then(people => {
+                const contacts = getContacts(people);
+                const text = `*Team*: ${teamName}\n\nCommitters:\n${contacts}`;
+                sendGenericAnnotation(spaceId, repositoryName, text, constants.GIT_REPOSITORY);
+                // const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
+                // app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
+            });
         });
     }).catch(err => {
         console.error('[ERROR] onViewCommitters', err);
@@ -174,7 +176,7 @@ const onGetCommitters = (message, annotation) => {
         if (_.isEmpty(teams)) {
             throw new Error('Committer Teams Not found');
         }
-        teamsFound(message, annotation, teams);
+        teamsFound(message, annotation, { repositoryId, teams });
     }).catch(err => {
         console.error('[ERROR] onGetCommitters', err);
         teamsNotFound(repositoryName, message, annotation);
