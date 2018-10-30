@@ -70,6 +70,7 @@ const teamsFound = (message, annotation, teams) => {
 
 const getContacts = people => {
     return _.chain(people)
+        .has('displayName')
         .sortBy('displayName')
         .map(({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`)
         .value()
@@ -148,10 +149,10 @@ const onViewCommitters = (message, annotation) => {
     console.log('TCL: onViewCommitters -> teamId, teamName', teamId, teamName);
     API.getTeam(teamId).then(team => {
         console.log('TCL: onViewCommitters -> team', team.name);
-        const { userId, spaceId } = message;
+        const { spaceId } = message;
         const { name, members, url } = team;
         return API.getPeople(app, members).then(people => {
-            console.log('TCL: onViewCommitters API.getPeople -> people', people);
+            console.log('TCL: onViewCommitters API.getPeople -> people', people.length);
             const contacts = getContacts(people);
             const text = `[Members URL](${url}/members)\n\nCommitters:\n${contacts}`;
             sendGenericAnnotation(spaceId, name, text, constants.GIT_REPOSITORY);
