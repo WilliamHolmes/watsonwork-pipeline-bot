@@ -125,8 +125,22 @@ const onShareServiceDetails = (message, annotation) => {
 };
 
 const onShareTeamDetails = (message, annotation) => {
+    // const { actionId = '' } = annotation;
+    // const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_SHARE_TEAM_COMMITTERS);
+    // API.getTeam(teamId).then(team => {
+    //     const { spaceId } = message;
+    //     const { name, members } = team;
+    //     const text = JSON.stringify(members);
+    //     sendGenericAnnotation(spaceId, name, text, constants.REPOSITORY_COMMITTERS);
+    // }).catch(err => {
+    //     console.error('[ERROR] onGetCommitters', err);
+    //     teamsNotFound(teamName, message, annotation);
+    // });
+}
+
+const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
-    const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_SHARE_TEAM_COMMITTERS);
+    const [teamId, teamName] = strings.chompLeft(actionId, constants.ACTION_VIEW_COMMITTERS);
     API.getTeam(teamId).then(team => {
         const { spaceId } = message;
         const { name, members } = team;
@@ -162,8 +176,9 @@ const onActionSelected = (message, annotation) => {
         case actionId.startsWith(constants.ACTION_SHARE_DETAILS):
             return onShareServiceDetails(message, annotation);
         case actionId.startsWith(constants.ACTION_GET_COMMITTERS):
-            console.log('TCL: onActionSelected ACTION_GET_COMMITTERS');
             return onGetCommitters(message, annotation);
+        case actionId.startsWith(constants.ACTION_VIEW_COMMITTERS):
+            return onViewCommitters(message, annotation);
         case actionId.startsWith(constants.ACTION_SHARE_TEAM_COMMITTERS):
             return onShareTeamDetails(message, annotation);
         default:
