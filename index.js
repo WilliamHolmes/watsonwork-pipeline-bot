@@ -69,7 +69,7 @@ const teamsFound = (message, annotation, teams) => {
 }
 
 const getContacts = people => {
-    return _.map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
+    return _.chain(people).sortBy('name').map(people, ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`).join('\n');
 }
 
 const getRepositories = (data = '') => {
