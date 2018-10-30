@@ -155,7 +155,7 @@ const onViewCommitters = (message, annotation) => {
         const { name: teamName, members } = team;
         return API.getPeople(app, members).then(people => {
             const contacts = getContacts(people);
-            const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
+            const text = `\n\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
             sendGenericAnnotation(spaceId, repositoryName, text, constants.GIT_REPOSITORY);
             // const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
             // app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
