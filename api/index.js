@@ -85,9 +85,7 @@ const api = {
         const q = query.getPeople(people);
         console.log('TCL: getPeople q', q);
         return app.sendGraphql(q).then(res => {
-            console.log('TCL: getPeople res', res);
-            // return _.values(res.data)
-            return [];
+            return _.values(res.data);
         }).catch(e => {
             console.error('[ERROR] TCL: getPeople', e);
             throw new Error(e);
