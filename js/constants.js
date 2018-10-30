@@ -1,7 +1,7 @@
 const constants = {
     SERVICE: 'service',
     COMMITTER_TEAMS: 'Committer Teams',
-    GIT_REPOSITORY: 'GIT Repository',
+    GIT_TEAMS: 'GIT Team',
     COMMITTERS_GROUP: '-committers',
     GIT_REPO: 'https://github.ibm.com/toscana',
     GIT_GQL: 'https://github.ibm.com/api/graphql',

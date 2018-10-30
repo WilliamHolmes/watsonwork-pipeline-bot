@@ -150,13 +150,11 @@ const onViewCommitters = (message, annotation) => {
     API.getTeam(teamId).then(team => {
         console.log('TCL: onViewCommitters -> team', team.name);
         const { spaceId } = message;
-        const { name, members, url } = team;
+        const { name, members } = team;
         return API.getPeople(app, members).then(people => {
-            console.log('TCL: onViewCommitters API.getPeople -> people', people.length);
             const contacts = getContacts(people);
-            console.log('TCL: onViewCommitters -> contacts', contacts.length);
-            const text = `[Members URL](${url}/members)\n\nCommitters:\n${contacts}`;
-            sendGenericAnnotation(spaceId, name, text, constants.GIT_REPOSITORY);
+            const text = `Committers:\n${contacts}`;
+            sendGenericAnnotation(spaceId, name, text, constants.GIT_TEAMS);
 
             // const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
             // app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
