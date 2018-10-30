@@ -1,6 +1,7 @@
 const _ = require('underscore');
 const Q = require('q');
 const fetch = require('node-fetch');
+const SDK = require('watsonworkspace-sdk');
 
 const db = require('../db');
 
@@ -36,7 +37,7 @@ const api = {
     getTeamsData: () => {
         return fetch(constants.GIT_GQL, {
             method: 'POST',
-            body: JSON.stringify({ query }),
+            body: JSON.stringify({ query: query.getTeams() }),
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${process.env.GIT_TOSCANA_TOKEN}`
@@ -79,6 +80,9 @@ const api = {
             const members = _.chain(allMembers).pick(team.members).values().value();
             return Object.assign({}, team, { members });
         });
+    },
+    getPeople: people => {
+        return ww.sendGraphql(query.getPeople(people)).then(({ data }) => _.values(data))
     }
 }
 

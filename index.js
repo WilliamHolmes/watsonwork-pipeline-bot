@@ -5,13 +5,15 @@ appFramework.level('verbose');
 appFramework.startServer();
 const app = appFramework.create();
 
-const UI = require('watsonworkspace-sdk').UI;
+const { UI } = require('watsonworkspace-sdk');
 
 const constants = require('./js/constants');
 const strings = require('./js/strings');
 const API = require('./api');
 
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
+
+console.log(' **** sendGraphql', !!app.sendGraphql);
 
 const serviceCard = data => {
     const { id, name = '', description, people = [] } = data;

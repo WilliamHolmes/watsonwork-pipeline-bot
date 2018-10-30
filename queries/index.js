@@ -1,4 +1,4 @@
-const query = `query {
+const getTeams = () => `query {
   organization(login:"toscana"){
     teams(first:100){
       nodes {
@@ -27,4 +27,20 @@ const query = `query {
   }
 }`;
 
-module.exports = query;
+const getPeople = people =>  {
+  let queryList = _.map(people, ({ email }, index) => {
+    return `query${index}: {
+      person(email: "${email}") {
+        id
+        email
+        displayName
+      }
+    }`;
+  });
+  return `query {${queryList}}`;
+}
+
+module.exports = {
+  getPeople,
+  getTeams
+}
