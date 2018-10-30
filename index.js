@@ -146,7 +146,7 @@ const onViewCommitters = (message, annotation) => {
         console.log('TCL: onViewCommitters -> team', team.name);
         const { spaceId } = message;
         const { name, members } = team;
-        const contacts = getContacts(_.map(members, obj => ({ ...obj, displayName: name })));
+        const contacts = getContacts(_.map(members, obj => ({ ...obj, displayName: obj.name })));
         const text = `\ncontacts:\n${contacts}`;
         sendGenericAnnotation(spaceId, name, text, constants.REPOSITORY_COMMITTERS);
     }).catch(err => {
