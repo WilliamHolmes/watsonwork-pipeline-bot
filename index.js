@@ -153,7 +153,7 @@ const onViewCommitters = (message, annotation) => {
         API.getPeople(app, members).then(people => {
             console.log('TCL: onViewCommitters API.getPeople -> people', people);
             const contacts = getContacts(people);
-            const text = `[Repository URL](${url})\n\nCommitters:\n${contacts}`;
+            const text = `[Repository URL](${url})\n[Members URL](${url}/members)\n\nCommitters:\n${contacts}`;
             sendGenericAnnotation(spaceId, name, text, constants.GIT_REPOSITORY);
         });
     }).catch(err => {
