@@ -77,8 +77,9 @@ const onShareServiceDetails = (message, annotation) => {
 const onShareTeamDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
     const { userId, spaceId } = message;
-    const [data] = Actions.getActionData(actionId, Constants.ACTION_SHARE_TEAM_COMMITTERS);
-    const { team: { name: teamName }, people, repositoryName } = JSON.parse(data);
+    const data = Actions.getActionData(actionId, Constants.ACTION_SHARE_TEAM_COMMITTERS);
+    console.log('TCL: onShareTeamDetails -> data', data);
+    const { people, repositoryName, teamName } = JSON.parse(data[0]);
     const contacts = People.getMentions(people);
     const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
     const description = `*${repositoryName}*: ${teamName}`;
@@ -95,7 +96,9 @@ const onViewCommitters = (message, annotation) => {
         const { name: teamName, members } = team;
         return API.getPeople(app, members).then(people => {
             const contacts = People.getContacts(people);
-            const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [JSON.stringify({ team, people, repositoryName })]);
+            const actionData = JSON.stringify({ people, repositoryName, teamName });
+            console.log('TCL: onViewCommitters -> actionData', actionData);
+            const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [actionData]);
             const title = `Repository: ${Strings.titleCase(repositoryName)}`
             const text = `Team: *${teamName}*\n\nCommitters:\n${contacts}`;
             const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
