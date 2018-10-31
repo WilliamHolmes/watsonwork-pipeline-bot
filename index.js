@@ -67,7 +67,7 @@ const onShareServiceDetails = (message, annotation) => {
         const contacts = People.getMentions(people);
         const repoDetails = _.map(name.split(' '), repo => `[${repo}](${Constants.GIT_REPO}/${repo})`).join('\n');
         const text = `\n${repoDetails}\n\ncontacts:\n${contacts}`;
-        sendGenericAnnotation(spaceId, description, text, Constants.SERVICE);
+        sendGenericAnnotation(spaceId, description, text, Constants.PIPELINE_SERVICE);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, Constants.SERVICE_SHARED));
     }).catch(err => {
         sendNotFound(err, Constants.SERVICE_NOT_FOUND, name, message, annotation);

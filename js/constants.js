@@ -1,6 +1,6 @@
 const constants = {
     SPLITTER: '|',
-    SERVICE: 'service',
+    PIPELINE_SERVICE: 'Pipeline Service',
     COMMITTER_TEAMS: 'Committer Teams',
     GIT_TEAMS: 'GIT Team',
     GIT_REPOSITORY: 'GIT Repository',
