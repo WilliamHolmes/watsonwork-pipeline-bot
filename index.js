@@ -63,12 +63,14 @@ const onGetServiceDetails = (message, annotation) => {
 const onShareServiceDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [serviceId] = Actions.getActionData(actionId, Constants.ACTION_SHARE_DETAILS);
+    console.log('TCL: onShareServiceDetails -> serviceId', serviceId);
 
     API.getServiceById(serviceId).then(services => {
         const { name, description, people } = _.first(services);
+        console.log('TCL: onShareServiceDetails -> people', people.length);
         const { userId, spaceId } = message;
         const contacts = People.getMentions(people);
-        const repoDetails = _.map(data.split(' '), repo => `[${repo}](${Constants.GIT_REPO}/${repo})`).join('\n');
+        const repoDetails = _.map(name.split(' '), repo => `[${repo}](${Constants.GIT_REPO}/${repo})`).join('\n');
         const text = `\n${repoDetails}\n\ncontacts:\n${contacts}`;
         sendGenericAnnotation(spaceId, description, text, Constants.SERVICE);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, Constants.SERVICE_SHARED));
