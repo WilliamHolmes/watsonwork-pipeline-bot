@@ -48,7 +48,7 @@ const onGetServiceDetails = (message, annotation) => {
         const { name, people, repo } = _.first(services);
         const link = `- ${Constants.GIT_REPO}/${repo}`
         const contacts =  People.getMentions(people);
-        const body = [`repo:\n${link}`, `contacts:\n${contacts}`].join('\n\n');
+        const body = [`Repo:\n${link}`, `Contacts:\n${contacts}`].join('\n\n');
         const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_DETAILS, [serviceId]);
         const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
         app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
@@ -66,7 +66,7 @@ const onShareServiceDetails = (message, annotation) => {
         const { userId, spaceId } = message;
         const contacts = People.getMentions(people);
         const repoDetails = _.map(name.split(' '), repo => `[${repo}](${Constants.GIT_REPO}/${repo})`).join('\n');
-        const text = `\n${repoDetails}\n\ncontacts:\n${contacts}`;
+        const text = `\n${repoDetails}\n\nContacts:\n${contacts}`;
         sendGenericAnnotation(spaceId, description, text, Constants.PIPELINE_SERVICE);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, Constants.SERVICE_SHARED));
     }).catch(err => {
