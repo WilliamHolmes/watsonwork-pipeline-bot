@@ -43,12 +43,9 @@ const onGetServiceDetails = (message, annotation) => {
     const { userId } = message;
     const { actionId = '' } = annotation;
     const [serviceId] = Actions.getActionData(actionId, Constants.ACTION_GET_DETAILS);
-    console.log('TCL: onGetServiceDetails -> serviceId', serviceId);
 
     API.getServiceById(serviceId).then(services => {
-        console.log('TCL: onGetServiceDetails -> services', services.length);
         const { name, people, repo } = _.first(services);
-        console.log('TCL: onGetServiceDetails -> people', people.length);
         const link = `- ${Constants.GIT_REPO}/${repo}`
         const contacts =  People.getMentions(people);
         const body = [`repo:\n${link}`, `contacts:\n${contacts}`].join('\n\n');
@@ -63,11 +60,9 @@ const onGetServiceDetails = (message, annotation) => {
 const onShareServiceDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [serviceId] = Actions.getActionData(actionId, Constants.ACTION_SHARE_DETAILS);
-    console.log('TCL: onShareServiceDetails -> serviceId', serviceId);
 
     API.getServiceById(serviceId).then(services => {
         const { name, description, people } = _.first(services);
-        console.log('TCL: onShareServiceDetails -> people', people.length);
         const { userId, spaceId } = message;
         const contacts = People.getMentions(people);
         const repoDetails = _.map(name.split(' '), repo => `[${repo}](${Constants.GIT_REPO}/${repo})`).join('\n');
@@ -80,17 +75,15 @@ const onShareServiceDetails = (message, annotation) => {
 };
 
 const onShareTeamDetails = (message, annotation) => {
-    // const { actionId = '' } = annotation;
-    // const [teamId, teamName] = Strings.chompLeft(actionId, Constants.ACTION_SHARE_TEAM_COMMITTERS);
-    // API.getTeam(teamId).then(team => {
-    //     const { spaceId } = message;
-    //     const { name, members } = team;
-    //     const text = JSON.stringify(members);
-    //     sendGenericAnnotation(spaceId, name, text, Constants.REPOSITORY_COMMITTERS);
-    // }).catch(err => {
-    //     console.error('[ERROR] onGetCommitters', err);
-    //     teamsNotFound(teamName, message, annotation);
-    // });
+    const { actionId = '' } = annotation;
+    const { userId, spaceId } = message;
+    const [data] = Actions.getActionData(actionId, Constants.ACTION_SHARE_TEAM_COMMITTERS);
+    const { team: { name: teamName }, people, repositoryName } = JSON.parse(data);
+    const contacts = People.getMentions(people);
+    const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
+    const description = `*${repositoryName}*: ${teamName}`;
+    sendGenericAnnotation(spaceId, repositoryName, text, Constants.GIT_REPOSITORY);
+    app.sendTargetedMessage(userId, annotation, UI.generic(description, Constants.COMMITTERS_SHARED));
 }
 
 const onViewCommitters = (message, annotation) => {
@@ -98,18 +91,14 @@ const onViewCommitters = (message, annotation) => {
     const [teamId, teamName, repositoryName] = Actions.getActionData(actionId, Constants.ACTION_VIEW_COMMITTERS);
 
     API.getTeam(teamId).then(team => {
-
-        //const { userId, spaceId } = message;
         const { userId } = message;
         const { name: teamName, members } = team;
         return API.getPeople(app, members).then(people => {
             const contacts = People.getContacts(people);
-            // const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
-            const text = `Team: *${teamName}*\n\nCommitters:\n${contacts}`;
-            // sendGenericAnnotation(spaceId, repositoryName, text, Constants.GIT_REPOSITORY);
-            const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [teamId, teamName, repositoryName]);
-            const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
+            const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [JSON.stringify({ team, people, repositoryName })]);
             const title = `Repository: ${Strings.titleCase(repositoryName)}`
+            const text = `Team: *${teamName}*\n\nCommitters:\n${contacts}`;
+            const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
             app.sendTargetedMessage(userId, annotation, UI.generic(title, text, buttons));
         });
     }).catch(err => {

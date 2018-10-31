@@ -21,6 +21,7 @@ const constants = {
     ACTION_SHARE_TEAM_COMMITTERS: 'workspace-pipeline-helper-share-committers|',
     ACTION_VIEW_COMMITTERS: 'workspace-pipeline-helper-view-committers|',
     SERVICE_SHARED: 'Service - Shared With Space',
+    COMMITTERS_SHARED: 'Committers - Shared With Space',
     LAST_UPDATED: 'Last Updated',
     buttons: {
         SERVICE_DETAILS: 'Get Service Details',
