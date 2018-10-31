@@ -1,5 +1,7 @@
 const _ = require('underscore');
 
+const strings = require('./strings');
+
 const people = {
     mention: ({ id, displayName }) => `- <@${id}|${strings.titleCase(displayName)}>`,
     contact: ({ displayName, email }) => `- *${strings.titleCase(displayName)}* (${email})`,
