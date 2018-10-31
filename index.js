@@ -108,7 +108,7 @@ const onViewCommitters = (message, annotation) => {
 const onViewTeams = (teamId, teamName, repositoryName, message, annotation) => {
     API.getTeam(teamId).then(team => {
         const { userId } = message;
-        const { name: teamName, members } = team;
+        const { members } = team;
         return API.getPeople(app, members).then(people => {
             const contacts = People.getContacts(people);
             const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [teamId, teamName, repositoryName]);
