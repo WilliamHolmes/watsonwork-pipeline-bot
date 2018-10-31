@@ -32,7 +32,12 @@ const repositoryFound = (message, annotation, repositories) => {
 
 const teamsFound = (message, annotation, data) => {
     const { repositoryName, teams } = data;
-    app.sendTargetedMessage(message.userId, annotation, Cards.getCards(teams, 'name', card => Cards.getTeam(card, repositoryName)));
+    if (teams.length === 1) {
+        const [{ teamId, name }] = teams;
+        onViewTeams(teamId, name, repositoryName);
+    } else {
+        app.sendTargetedMessage(message.userId, annotation, Cards.getCards(teams, 'name', card => Cards.getTeam(card, repositoryName)));
+    }
 }
 
 const sendGenericAnnotation = (spaceId, title = '', text = '', name = '') =>  {
@@ -97,7 +102,10 @@ const onShareTeamDetails = (message, annotation) => {
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [teamId, teamName, repositoryName] = Actions.getActionData(actionId, Constants.ACTION_VIEW_COMMITTERS);
+    onViewTeams(teamId, teamName, repositoryName);
+}
 
+const onViewTeams = (teamId, teamName, repositoryName) => {
     API.getTeam(teamId).then(team => {
         const { userId } = message;
         const { name: teamName, members } = team;
