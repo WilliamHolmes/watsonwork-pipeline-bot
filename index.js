@@ -86,8 +86,8 @@ const onShareTeamDetails = (message, annotation) => {
             const contacts = People.getMentions(people);
             const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
             sendGenericAnnotation(spaceId, repositoryName, text, Constants.GIT_REPOSITORY);
-            const description = `*${repositoryName}* > ${teamName}`;
-            app.sendTargetedMessage(userId, annotation, UI.generic(description, Constants.COMMITTERS_SHARED));
+            const title = Strings.titleCase(`${repositoryName} - ${teamName}`);
+            app.sendTargetedMessage(userId, annotation, UI.generic(title, Constants.COMMITTERS_SHARED));
         });
     }).catch(err => {
         sendNotFound(err, Constants.COMMITTERS_NOT_FOUND, teamName, message, annotation);
@@ -105,7 +105,7 @@ const onViewCommitters = (message, annotation) => {
             const contacts = People.getContacts(people);
             const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [teamId, teamName, repositoryName]);
             const title = `Repository: ${Strings.titleCase(repositoryName)}`
-            const text = `Team: *${teamName}*\n\nCommitters:\n${contacts}`;
+            const text = `Team: *${Strings.titleCase(teamName)}*\n\nCommitters:\n${contacts}`;
             const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
             app.sendTargetedMessage(userId, annotation, UI.generic(title, text, buttons));
         });
