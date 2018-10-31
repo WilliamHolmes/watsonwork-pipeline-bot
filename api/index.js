@@ -27,12 +27,13 @@ const api = {
     },
     getService: txt => {
         return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => {
+            console.log('findService > getService > services', services.length)
             if(services.length) {
-                return Q.allSettled(_.map(search(services, txt, constants.search.SERVICE_KEYS), api.getPeople)).then(data => _.pluck(data, 'value'));
+                return Q.allSettled(_.map(search(services, txt, constants.search.SERVICE_KEYS), api.getServicePeople)).then(data => _.pluck(data, 'value'));
             }
         }).then(api.errorHandler);
     },
-    getPeople: service => {
+    getServicePeople: service => {
         return db.getDOC(constants.db.DOCS.PEOPLE).then(({ people = []}) => {
             return Object.assign({}, service, {
                 people: _.chain(people).indexBy('id').pick(service.people).values().value()
