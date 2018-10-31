@@ -9,7 +9,7 @@ const cards = {
     getCards: (data, sortKey, card) => _.chain(data).sortBy(sortKey).map(card).value(),
     getService: data => {
         const { id, name = '', description, people = [] } = data;
-        const subTitle = strings.getPlural('contact', people);
+        const subTitle = strings.usePlural('contact', people);
         const actionId = actions.getActionId(constants.ACTION_GET_DETAILS, [id]);
         const date = (_.now() - 60000);
         return UI.card(description, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
@@ -26,7 +26,7 @@ const cards = {
         const subTitle = constants.LAST_UPDATED;
         const actionId = actions.getActionId(constants.ACTION_VIEW_COMMITTERS, [id, name, repositoryName]);
         const date = new Date(updatedAt).getTime();
-        const body = strings.getPlural('committer', members);
+        const body = strings.usePlural('committer', members);
         return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.VIEW_COMMITTERS, actionId)], date);
     }
 }
