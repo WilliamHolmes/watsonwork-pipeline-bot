@@ -43,9 +43,12 @@ const onGetServiceDetails = (message, annotation) => {
     const { userId } = message;
     const { actionId = '' } = annotation;
     const [serviceId] = Actions.getActionData(actionId, Constants.ACTION_GET_DETAILS);
+    console.log('TCL: onGetServiceDetails -> serviceId', serviceId);
 
     API.getServiceById(serviceId).then(services => {
+        console.log('TCL: onGetServiceDetails -> services', services.length);
         const { name, people, repo } = _.first(services);
+        console.log('TCL: onGetServiceDetails -> people', people.length);
         const link = `- ${Constants.GIT_REPO}/${repo}`
         const contacts =  People.getMentions(people);
         const body = [`repo:\n${link}`, `contacts:\n${contacts}`].join('\n\n');

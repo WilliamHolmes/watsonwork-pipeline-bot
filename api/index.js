@@ -20,8 +20,9 @@ const api = {
     },
     getServiceById: id => {
         return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => {
+            console.log('TCL: getServiceById services', services.length);
             if(services.length) {
-                return Q.allSettled(_.map(_.where(services, { id }), api.getPeople)).then(data => _.pluck(data, 'value'));
+                return Q.allSettled(_.map(_.where(services, { id }), api.getServicePeople)).then(data => _.pluck(data, 'value'));
             }
         }).then(api.errorHandler);
     },
