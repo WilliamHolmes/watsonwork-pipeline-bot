@@ -89,19 +89,23 @@ const onShareTeamDetails = (message, annotation) => {
 
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
+    console.log('TCL: onViewCommitters -> actionId', actionId);
     const [teamId, teamName, repositoryName] = Actions.getActionData(actionId, Constants.ACTION_VIEW_COMMITTERS);
+    console.log('TCL: onViewCommitters -> teamId, teamName, repositoryName', teamId, teamName, repositoryName);
 
     API.getTeam(teamId).then(team => {
-        const { userId } = message;
         const { name: teamName, members } = team;
         return API.getPeople(app, members).then(people => {
-            const contacts = People.getContacts(people);
+            const { userId } = message;
             const actionData = JSON.stringify({ people, repositoryName, teamName });
             console.log('TCL: onViewCommitters -> actionData', actionData);
             const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [actionData]);
+            console.log('TCL: onViewCommitters -> shareActionId', shareActionId);
             const title = `Repository: ${Strings.titleCase(repositoryName)}`
+            const contacts = People.getContacts(people);
             const text = `Team: *${teamName}*\n\nCommitters:\n${contacts}`;
             const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
+            console.log('TCL: onViewCommitters -> sendTargetedMessage');
             app.sendTargetedMessage(userId, annotation, UI.generic(title, text, buttons));
         });
     }).catch(err => {
