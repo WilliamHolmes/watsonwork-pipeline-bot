@@ -13,19 +13,25 @@ const strings = require('../js/strings');
 const normalize = require('../js/normalize');
 
 const api = {
+    errorHandler: data => {
+        if (_.isEmpty(data)) {
+            throw new Error();
+        }
+        return data;
+    },
     getServiceById: id => {
         return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => {
             if(services.length) {
                 return Q.allSettled(_.map(_.where(services, { id }), api.getPeople)).then(data => _.pluck(data, 'value'));
             }
-        });
+        }).then(api.errorHandler);
     },
     getService: txt => {
         return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => {
             if(services.length) {
                 return Q.allSettled(_.map(search(services, txt, constants.search.SERVICE_KEYS), api.getPeople)).then(data => _.pluck(data, 'value'));
             }
-        });
+        }).then(api.errorHandler);
     },
     getPeople: service => {
         return db.getDOC(constants.db.DOCS.PEOPLE).then(({ people = []}) => {
@@ -47,7 +53,7 @@ const api = {
     getRepository: name => {
         return api.getRepositories().then(repositories => {
             return search(_.values(repositories), name, constants.search.REPOSITORY_KEYS)
-        });
+        }).then(api.errorHandler);
     },
     getRepositories: () => {
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ repositories }) => {
@@ -67,19 +73,14 @@ const api = {
                 .filter(({ repositories }) => _.contains(repositories, repositoryId))
                 .filter(({ name }) => strings.endsWith(name, constants.COMMITTERS_GROUP))
                 .value();
-        });
+        }).then(api.errorHandler);
     },
     getTeam: teamId => {
-        console.log('TCL: getTeam teamId', teamId);
         return db.getDOC(constants.db.DOCS.TEAMS).then(({ members: allMembers, teams }) => {
             const team = teams[teamId];
-            console.log('TCL: getTeam team', team);
-            if (_.isEmpty(team)) {
-                return;
-            }
             const members = _.chain(allMembers).pick(team.members).values().value();
             return Object.assign({}, team, { members });
-        });
+        }).then(api.errorHandler);
     },
     getPeople: (app, people) => {
         const q = query.getPeople(people);

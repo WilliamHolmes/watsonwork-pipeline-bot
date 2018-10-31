@@ -97,10 +97,6 @@ const onGetServiceDetails = (message, annotation) => {
     const [serviceId] = getActionData(actionId, constants.ACTION_GET_DETAILS);
 
     API.getServiceById(serviceId).then(services => {
-        if (_.isEmpty(services)) {
-            throw new Error('Service Not found');
-        }
-
         const { name, people, repo } = _.first(services);
         const link = `- ${constants.GIT_REPO}/${repo}`
         const contacts =  getContacts(people);
@@ -123,10 +119,6 @@ const onShareServiceDetails = (message, annotation) => {
     const [serviceId] = getActionData(actionId, constants.ACTION_SHARE_DETAILS);
 
     API.getServiceById(serviceId).then(services => {
-        if (_.isEmpty(services)) {
-            throw new Error('Service Not found');
-        }
-
         const { name, description, people } = _.first(services);
         const { userId, spaceId } = message;
         const contacts = getContacts(people);
@@ -175,7 +167,7 @@ const onViewCommitters = (message, annotation) => {
             const title = `Repository: ${strings.titleCase(repositoryName)}`
             app.sendTargetedMessage(userId, annotation, UI.generic(title, text, buttons));
         });
-    }).catch(err => {    }).catch(err => {
+    }).catch(err => {
         teamsNotFound(teamName, message, annotation);
     });
 }
@@ -184,9 +176,6 @@ const onGetCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [repositoryId, repositoryName] = getActionData(actionId, constants.ACTION_GET_COMMITTERS);
     API.getCommitterTeams(repositoryId).then(teams => {
-        if (_.isEmpty(teams)) {
-            throw new Error('Committer Teams Not found');
-        }
         teamsFound(message, annotation, { repositoryName, teams });
     }).catch(err => {
         teamsNotFound(repositoryName, message, annotation);
@@ -214,9 +203,6 @@ const onActionSelected = (message, annotation) => {
 const findCommitters = (message, annotation, params) => {
     const repository = _.first(params);
     API.getRepository(repository).then(repositories => {
-        if (_.isEmpty(repositories)) {
-            throw new Error('Repository Not found');
-        }
         repositoryFound(message, annotation, repositories);
     }).catch(err => {
         repositoryNotFound(repository, message, annotation);
@@ -226,9 +212,6 @@ const findCommitters = (message, annotation, params) => {
 const findService = (message, annotation, params) => {
     const serviceName = _.first(params);
     API.getService(serviceName).then(services => {
-        if (_.isEmpty(services)) {
-            throw new Error('Service Not found');
-        }
         serviceFound(message, annotation, services);
     }).catch(err => {
         serviceNotFound(serviceName, message, annotation);
