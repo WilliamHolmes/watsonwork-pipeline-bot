@@ -76,36 +76,37 @@ const onShareServiceDetails = (message, annotation) => {
 
 const onShareTeamDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
-    const { userId, spaceId } = message;
-    const data = Actions.getActionData(actionId, Constants.ACTION_SHARE_TEAM_COMMITTERS);
-    console.log('TCL: onShareTeamDetails -> data', data);
-    const { people, repositoryName, teamName } = JSON.parse(data[0]);
-    const contacts = People.getMentions(people);
-    const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
-    const description = `*${repositoryName}*: ${teamName}`;
-    sendGenericAnnotation(spaceId, repositoryName, text, Constants.GIT_REPOSITORY);
-    app.sendTargetedMessage(userId, annotation, UI.generic(description, Constants.COMMITTERS_SHARED));
+    const [teamId, teamName, repositoryName] = Actions.getActionData(actionId, Constants.ACTION_SHARE_TEAM_COMMITTERS);
+
+    API.getTeam(teamId).then(team => {
+        const { userId, spaceId } = message;
+        const { name: teamName, members } = team;
+
+        return API.getPeople(app, members).then(people => {
+            const contacts = People.getMentions(people);
+            const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
+            sendGenericAnnotation(spaceId, repositoryName, text, Constants.GIT_REPOSITORY);
+            const description = `*${repositoryName}* > ${teamName}`;
+            app.sendTargetedMessage(userId, annotation, UI.generic(description, Constants.COMMITTERS_SHARED));
+        });
+    }).catch(err => {
+        sendNotFound(err, Constants.COMMITTERS_NOT_FOUND, teamName, message, annotation);
+    });
 }
 
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
-    console.log('TCL: onViewCommitters -> actionId', actionId);
     const [teamId, teamName, repositoryName] = Actions.getActionData(actionId, Constants.ACTION_VIEW_COMMITTERS);
-    console.log('TCL: onViewCommitters -> teamId, teamName, repositoryName', teamId, teamName, repositoryName);
 
     API.getTeam(teamId).then(team => {
+        const { userId } = message;
         const { name: teamName, members } = team;
         return API.getPeople(app, members).then(people => {
-            const { userId } = message;
-            const actionData = JSON.stringify({ people, repositoryName, teamName });
-            console.log('TCL: onViewCommitters -> actionData', actionData);
-            const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [actionData]);
-            console.log('TCL: onViewCommitters -> shareActionId', shareActionId);
-            const title = `Repository: ${Strings.titleCase(repositoryName)}`
             const contacts = People.getContacts(people);
+            const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [team, people, repositoryName]);
+            const title = `Repository: ${Strings.titleCase(repositoryName)}`
             const text = `Team: *${teamName}*\n\nCommitters:\n${contacts}`;
             const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
-            console.log('TCL: onViewCommitters -> sendTargetedMessage');
             app.sendTargetedMessage(userId, annotation, UI.generic(title, text, buttons));
         });
     }).catch(err => {
