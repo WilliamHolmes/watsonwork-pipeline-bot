@@ -34,7 +34,7 @@ const teamsFound = (message, annotation, data) => {
     const { repositoryName, teams } = data;
     if (teams.length === 1) {
         const [{ teamId, name }] = teams;
-        onViewTeams(teamId, name, repositoryName);
+        onViewTeams(teamId, name, repositoryName, message, annotation);
     } else {
         app.sendTargetedMessage(message.userId, annotation, Cards.getCards(teams, 'name', card => Cards.getTeam(card, repositoryName)));
     }
@@ -102,10 +102,10 @@ const onShareTeamDetails = (message, annotation) => {
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [teamId, teamName, repositoryName] = Actions.getActionData(actionId, Constants.ACTION_VIEW_COMMITTERS);
-    onViewTeams(teamId, teamName, repositoryName);
+    onViewTeams(teamId, teamName, repositoryName, message, annotation);
 }
 
-const onViewTeams = (teamId, teamName, repositoryName) => {
+const onViewTeams = (teamId, teamName, repositoryName, message, annotation) => {
     API.getTeam(teamId).then(team => {
         const { userId } = message;
         const { name: teamName, members } = team;
