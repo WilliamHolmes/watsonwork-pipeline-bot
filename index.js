@@ -13,10 +13,22 @@ const API = require('./api');
 
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
+const getActionId = (key, data) => {
+    return `${key}${data.join(constants.SPLITTER)}`;
+}
+
+const getActionData = (id, actionId) => {
+    return strings.chompLeft(id, actionId).split(constants.SPLITTER);
+}
+
+const getPlural = (text, data) => {
+    return `${data.length} ${text}${data.length === 1 ? '' : 's'}`;
+}
+
 const serviceCard = data => {
     const { id, name = '', description, people = [] } = data;
-    const subTitle = `${people.length} contact${people.length === 1 ? '' : 's'}`;
-    const actionId = `${constants.ACTION_GET_DETAILS}${id}`;
+    const subTitle = getPlural('contact', people);
+    const actionId = getActionId(constants.ACTION_GET_DETAILS, [id]);
     const date = (_.now() - 60000);
     return UI.card(description, subTitle, name, [UI.cardButton(constants.buttons.SERVICE_DETAILS, actionId)], date);
 }
@@ -24,20 +36,17 @@ const serviceCard = data => {
 const repositoryCard = data => {
     const { id, name, url, updatedAt } = data;
     const subTitle = constants.LAST_UPDATED;
-    const actionId = `${constants.ACTION_GET_COMMITTERS}${id}|${name}`;
+    const actionId = getActionId(constants.ACTION_GET_COMMITTERS, [id, name]);
     const date = new Date(updatedAt).getTime();
     return UI.card(name, subTitle, url, [UI.cardButton(constants.buttons.GET_COMMITTERS, actionId)], date);
 }
 
 const teamCard = (data, repositoryName) => {
-    console.log('TCL: teamCard -> repositoryName', repositoryName);
     const { id, members, name, updatedAt } = data;
-    console.log('TCL: teamCard');
     const subTitle = constants.LAST_UPDATED;
-    const actionId = `${constants.ACTION_VIEW_COMMITTERS}${id}|${name}|${repositoryName}`;
+    const actionId = getActionId(constants.ACTION_VIEW_COMMITTERS, [id, name, repositoryName]);
     const date = new Date(updatedAt).getTime();
-    const body = `${members.length} committer${members.length === 1 ? '' : 's'}`;
-    console.log('TCL: name, subTitle, body', name, subTitle, body);
+    const body = getPlural('committer', members);
     return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.VIEW_COMMITTERS, actionId)], date);
 }
 
@@ -85,20 +94,22 @@ const getRepositories = (data = '') => {
 const onGetServiceDetails = (message, annotation) => {
     const { userId } = message;
     const { actionId = '' } = annotation;
-    const serviceId = strings.chompLeft(actionId, constants.ACTION_GET_DETAILS);
+    const [serviceId] = getActionData(actionId, constants.ACTION_GET_DETAILS);
+
     API.getServiceById(serviceId).then(services => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
         }
+
         const { name, people, repo } = _.first(services);
         const link = `- ${constants.GIT_REPO}/${repo}`
         const contacts =  getContacts(people);
         const body = [`repo:\n${link}`, `contacts:\n${contacts}`].join('\n\n');
-        const shareActionId = `${constants.ACTION_SHARE_DETAILS}${serviceId}`;
+        const shareActionId = getActionId(constants.ACTION_SHARE_DETAILS, [serviceId]);
         const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
         app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
+
     }).catch(err => {
-        console.error('[ERROR] onGetServiceDetails', err);
         serviceNotFound(name, message, annotation);
     });
 }
@@ -109,7 +120,7 @@ const sendGenericAnnotation = (spaceId, title = '', text = '', name = '') =>  {
 
 const onShareServiceDetails = (message, annotation) => {
     const { actionId = '' } = annotation;
-    const serviceId = strings.chompLeft(actionId, constants.ACTION_SHARE_DETAILS);
+    const [serviceId] = getActionData(actionId, constants.ACTION_SHARE_DETAILS);
 
     API.getServiceById(serviceId).then(services => {
         if (_.isEmpty(services)) {
@@ -124,8 +135,8 @@ const onShareServiceDetails = (message, annotation) => {
 
         sendGenericAnnotation(spaceId, description, text, constants.SERVICE);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, constants.SERVICE_SHARED));
+
     }).catch(err => {
-        console.error('[ERROR] onShareServiceDetails', err);
         serviceNotFound(name, message, annotation);
     });
 };
@@ -146,7 +157,7 @@ const onShareTeamDetails = (message, annotation) => {
 
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
-    const [teamId, teamName, repositoryName] = strings.chompLeft(actionId, constants.ACTION_VIEW_COMMITTERS).split('|');
+    const [teamId, teamName, repositoryName] = getActionData(actionId, constants.ACTION_VIEW_COMMITTERS);
 
     API.getTeam(teamId).then(team => {
 
@@ -157,12 +168,12 @@ const onViewCommitters = (message, annotation) => {
         return API.getPeople(app, members).then(people => {
             const contacts = getContacts(people);
             // const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
-            const committers = `${people.length} Committer${people.length === 1 ? '' : 's'}`;
-            const text = `Team: *${teamName}*\n\n${committers}:\n${contacts}`;
+            const text = `Team: *${teamName}*\n\nCommitters:\n${contacts}`;
             // sendGenericAnnotation(spaceId, repositoryName, text, constants.GIT_REPOSITORY);
-            const shareActionId = `${constants.ACTION_SHARE_TEAM_COMMITTERS}${teamId}|${teamName}|${repositoryName}`
+            const shareActionId = getActionId(constants.ACTION_SHARE_TEAM_COMMITTERS, [teamId, teamName, repositoryName]);
             const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
-            app.sendTargetedMessage(userId, annotation, UI.generic(repositoryName, text, buttons));
+            const title = `Repository: ${strings.titleCase(repositoryName)}`
+            app.sendTargetedMessage(userId, annotation, UI.generic(title, text, buttons));
         });
     }).catch(err => {    }).catch(err => {
         teamsNotFound(teamName, message, annotation);
@@ -171,16 +182,13 @@ const onViewCommitters = (message, annotation) => {
 
 const onGetCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
-    const [repositoryId, repositoryName] = strings.chompLeft(actionId, constants.ACTION_GET_COMMITTERS).split('|');
-    console.log('TCL: onGetCommitters -> repositoryId, repositoryName');
+    const [repositoryId, repositoryName] = getActionData(actionId, constants.ACTION_GET_COMMITTERS);
     API.getCommitterTeams(repositoryId).then(teams => {
-        console.log('TCL: onGetCommitters');
         if (_.isEmpty(teams)) {
             throw new Error('Committer Teams Not found');
         }
         teamsFound(message, annotation, { repositoryName, teams });
     }).catch(err => {
-        console.error('[ERROR] onGetCommitters', err);
         teamsNotFound(repositoryName, message, annotation);
     });
 }
@@ -205,28 +213,24 @@ const onActionSelected = (message, annotation) => {
 
 const findCommitters = (message, annotation, params) => {
     const repository = _.first(params);
-    console.log('TCL: findCommitters -> repository', repository);
     API.getRepository(repository).then(repositories => {
         if (_.isEmpty(repositories)) {
             throw new Error('Repository Not found');
         }
         repositoryFound(message, annotation, repositories);
     }).catch(err => {
-        console.error('[ERROR] findCommitters', err);
         repositoryNotFound(repository, message, annotation);
     });
 }
 
 const findService = (message, annotation, params) => {
     const serviceName = _.first(params);
-    console.log('TCL: findService -> serviceName', serviceName);
     API.getService(serviceName).then(services => {
         if (_.isEmpty(services)) {
             throw new Error('Service Not found');
         }
         serviceFound(message, annotation, services);
     }).catch(err => {
-        console.error('[ERROR] findService', err);
         serviceNotFound(serviceName, message, annotation);
     });
 }
