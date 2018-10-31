@@ -28,7 +28,6 @@ const db = {
         return cloudantDB;
     },
     getDOC: key => {
-        console.log('getDOC key', key);
         return new Promise((resolve, reject) => {
             const doc = db.docs.getDoc(key);
             if (doc) {
@@ -45,11 +44,9 @@ const db = {
         })
     },
     updateDOC: (key, data) => {
-        console.log('updateDOC: key, data', key, data);
         return db.getDOC(key).then(doc => {
             let newDoc = Object.assign({}, doc, data);
             return db.getDB().insert(newDoc, (err, data) => {
-            console.log('DB INSERT: err, data', err, data);
                 if (data && data.rev) {
                     newDoc._rev = data.rev;
                 }

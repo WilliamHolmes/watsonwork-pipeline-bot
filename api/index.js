@@ -4,13 +4,12 @@ const fetch = require('node-fetch');
 const SDK = require('watsonworkspace-sdk');
 
 const db = require('../db');
-
 const query = require('../queries');
 
 const constants = require('../js/constants');
+const normalize = require('../js/normalize');
 const search = require('../js/search');
 const strings = require('../js/strings');
-const normalize = require('../js/normalize');
 
 const api = {
     errorHandler: data => {
@@ -84,9 +83,7 @@ const api = {
     },
     getPeople: (app, people) => {
         const q = query.getPeople(people);
-        console.log('TCL: getPeople q', q);
         return app.sendGraphql(q).then(data => _.values(data)).catch(e => {
-            console.error('[ERROR] TCL: getPeople', e);
             throw new Error(e);
         });
     }

@@ -1,8 +1,8 @@
 const { UI } = require('watsonworkspace-sdk');
 const _ = require('underscore');
 
-const constants = require('./constants');
 const actions = require('./actions');
+const constants = require('./constants');
 const strings = require('./strings');
 
 const cards = {
@@ -30,5 +30,11 @@ const cards = {
         return UI.card(name, subTitle, body, [UI.cardButton(constants.buttons.VIEW_COMMITTERS, actionId)], date);
     }
 }
+
+Object.assign(cards, {
+    SERVICE: cards.getService,
+    REPOSITORY: cards.getRepository,
+    TEAM: cards.getTeam
+});
 
 module.exports = cards;

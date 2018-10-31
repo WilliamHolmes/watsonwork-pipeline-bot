@@ -7,25 +7,27 @@ const app = appFramework.create();
 
 const { UI } = require('watsonworkspace-sdk');
 
-const Actions = require('./js/actions');
-const Constants = require('./js/constants');
-const Strings = require('./js/strings');
-const People = require('./js/people');
-const Cards = require('./js/cards');
 const API = require('./api');
+
+const Actions = require('./js/actions');
+const Cards = require('./js/cards');
+const Constants = require('./js/constants');
+const People = require('./js/people');
+const Strings = require('./js/strings');
 
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
-const sendNotFound = (title, data, message, annotation) => {
+const sendNotFound = (error, title, data, message, annotation) => {
+    console.error('[ERROR] ${title}', error);
     app.sendTargetedMessage(message.userId, annotation, UI.generic(title, `${data} - not found.`));
 }
 
 const serviceFound = (message, annotation, services) => {
-    app.sendTargetedMessage(message.userId, annotation, Cards.getCards(services, 'description', Cards.getService));
+    app.sendTargetedMessage(message.userId, annotation, Cards.getCards(services, 'description', Cards.SERVICE));
 }
 
 const repositoryFound = (message, annotation, repositories) => {
-    app.sendTargetedMessage(message.userId, annotation, Cards.getCards(repositories, 'name', Cards.getRepository));
+    app.sendTargetedMessage(message.userId, annotation, Cards.getCards(repositories, 'name', Cards.REPOSITORY));
 }
 
 const teamsFound = (message, annotation, data) => {
@@ -51,7 +53,7 @@ const onGetServiceDetails = (message, annotation) => {
         const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
         app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
     }).catch(err => {
-        sendNotFound(Constants.SERVICE_NOT_FOUND, name, message, annotation);
+        sendNotFound(err, Constants.SERVICE_NOT_FOUND, name, message, annotation);
     });
 }
 
@@ -63,12 +65,12 @@ const onShareServiceDetails = (message, annotation) => {
         const { name, description, people } = _.first(services);
         const { userId, spaceId } = message;
         const contacts = People.getMentions(people);
-        const repoDetails = _.map(data.split(' '), repo => `[${repo}](${Constants.GIT_REPO}/${repo})`).join('\n');;
+        const repoDetails = _.map(data.split(' '), repo => `[${repo}](${Constants.GIT_REPO}/${repo})`).join('\n');
         const text = `\n${repoDetails}\n\ncontacts:\n${contacts}`;
         sendGenericAnnotation(spaceId, description, text, Constants.SERVICE);
         app.sendTargetedMessage(userId, annotation, UI.generic(description, Constants.SERVICE_SHARED));
     }).catch(err => {
-        sendNotFound(Constants.SERVICE_NOT_FOUND, name, message, annotation);
+        sendNotFound(err, Constants.SERVICE_NOT_FOUND, name, message, annotation);
     });
 };
 
@@ -106,7 +108,7 @@ const onViewCommitters = (message, annotation) => {
             app.sendTargetedMessage(userId, annotation, UI.generic(title, text, buttons));
         });
     }).catch(err => {
-        sendNotFound(Constants.COMMITTERS_NOT_FOUND, teamName, message, annotation);
+        sendNotFound(err, Constants.COMMITTERS_NOT_FOUND, teamName, message, annotation);
     });
 }
 
@@ -116,7 +118,7 @@ const onGetCommitters = (message, annotation) => {
     API.getCommitterTeams(repositoryId).then(teams => {
         teamsFound(message, annotation, { repositoryName, teams });
     }).catch(err => {
-        sendNotFound(Constants.COMMITTERS_NOT_FOUND, repositoryName, message, annotation);
+        sendNotFound(err, Constants.COMMITTERS_NOT_FOUND, repositoryName, message, annotation);
     });
 }
 
@@ -143,7 +145,7 @@ const findCommitters = (message, annotation, params) => {
     API.getRepository(repository).then(repositories => {
         repositoryFound(message, annotation, repositories);
     }).catch(err => {
-        sendNotFound(Constants.REPOSITORY_NOT_FOUND, repository, message, annotation);
+        sendNotFound(err, Constants.REPOSITORY_NOT_FOUND, repository, message, annotation);
     });
 }
 
@@ -152,7 +154,7 @@ const findService = (message, annotation, params) => {
     API.getService(serviceName).then(services => {
         serviceFound(message, annotation, services);
     }).catch(err => {
-        sendNotFound(Constants.SERVICE_NOT_FOUND, serviceName, message, annotation);
+        sendNotFound(err, Constants.SERVICE_NOT_FOUND, serviceName, message, annotation);
     });
 }
 
