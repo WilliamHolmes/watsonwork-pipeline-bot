@@ -34,8 +34,7 @@
     "string": "^3.3.3",
     "underscore": "^1.8.3",
     "watsonworkspace-bot": "^2.0.0",
-    "watsonworkspace-sdk": "^2.0.0",
-    "winston": "^2.4.4"
+    "watsonworkspace-sdk": "^2.0.0"
   },
   "engines": {
     "node": "10.13.0",
