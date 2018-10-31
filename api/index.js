@@ -83,7 +83,9 @@ const api = {
     },
     getPeople: (app, people) => {
         const q = query.getPeople(people);
-        return app.sendGraphql(q).then(data => _.values(data)).catch(e => {
+        return app.sendGraphql(q).then(data => {
+            return _.chain(data).values().compact().value();
+        }).catch(e => {
             throw new Error(e);
         });
     }
