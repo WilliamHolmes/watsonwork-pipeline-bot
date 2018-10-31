@@ -147,21 +147,24 @@ const onShareTeamDetails = (message, annotation) => {
 const onViewCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [teamId, teamName, repositoryName] = strings.chompLeft(actionId, constants.ACTION_VIEW_COMMITTERS).split('|');
-    console.log('TCL: onViewCommitters -> teamId, teamName', teamId, teamName);
+
     API.getTeam(teamId).then(team => {
-        console.log('TCL: onViewCommitters -> team', team.name);
-        const { spaceId } = message;
-        console.log('TCL: onViewCommitters -> repositoryName', repositoryName);
+
+        //const { userId, spaceId } = message;
+        const { userId } = message;
+
         const { name: teamName, members } = team;
         return API.getPeople(app, members).then(people => {
             const contacts = getContacts(people);
-            const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
-            sendGenericAnnotation(spaceId, repositoryName, text, constants.GIT_REPOSITORY);
-            // const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
-            // app.sendTargetedMessage(userId, annotation, UI.generic(name, body, buttons));
+            // const text = `\nTeam: *${teamName}*\n\nCommitters:\n${contacts}`;
+            const committers = `${people.length} Committer${people.length === 1 ? '' : 's'}`;
+            const text = `Team: *${teamName}*\n\n${committers}:\n${contacts}`;
+            // sendGenericAnnotation(spaceId, repositoryName, text, constants.GIT_REPOSITORY);
+            const shareActionId = `${constants.ACTION_SHARE_TEAM_COMMITTERS}${teamId}|${teamName}|${repositoryName}`
+            const buttons = [UI.button(shareActionId, constants.buttons.SHARE_DETAILS)];
+            app.sendTargetedMessage(userId, annotation, UI.generic(repositoryName, text, buttons));
         });
-    }).catch(err => {
-        console.error('[ERROR] onViewCommitters', err);
+    }).catch(err => {    }).catch(err => {
         teamsNotFound(teamName, message, annotation);
     });
 }
