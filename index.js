@@ -103,7 +103,7 @@ const onViewCommitters = (message, annotation) => {
         const { name: teamName, members } = team;
         return API.getPeople(app, members).then(people => {
             const contacts = People.getContacts(people);
-            const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [team, people, repositoryName]);
+            const shareActionId = Actions.getActionId(Constants.ACTION_SHARE_TEAM_COMMITTERS, [teamId, teamName, repositoryName]);
             const title = `Repository: ${Strings.titleCase(repositoryName)}`
             const text = `Team: *${teamName}*\n\nCommitters:\n${contacts}`;
             const buttons = [UI.button(shareActionId, Constants.buttons.SHARE_DETAILS)];
