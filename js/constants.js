@@ -15,6 +15,17 @@ const constants = {
         SERVICE_KEYS: ['description', 'name', 'repo'],
         OPTIONS: { caseSensitive: false, sort: true }
     },
+    focus: {
+        TYPE: 'message-focus',
+        actions: {
+            SERVICE_COMMITTERS: 'Get Service Committers',
+            PIPELINE_CONTACTS: 'Get Pipeline Contacts'
+        },
+        LENS: 'Service',
+        CATEGORY: 'Committers',
+        COMMITTERS_ACTION: 'Get Service Committers',
+        PIPELINE_ACTION: 'Get Pipeline Contacts'
+    },
     ACTION_GET_DETAILS: 'workspace-pipeline-helper-get-service|',
     ACTION_GET_COMMITTERS: 'workspace-pipeline-helper-get-committers|',
     ACTION_SHARE_DETAILS: 'workspace-pipeline-helper-share-service|',

@@ -32,6 +32,9 @@ const api = {
             }
         }).then(api.errorHandler);
     },
+    getServices: () => {
+        return db.getDOC(constants.db.DOCS.SERVICES).then(({ services = []}) => services);
+    },
     getServicePeople: service => {
         return db.getDOC(constants.db.DOCS.PEOPLE).then(({ people = []}) => {
             return Object.assign({}, service, {

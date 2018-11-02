@@ -31,7 +31,7 @@ const getTeams = () => `query {
 
 const getPeople = people =>  {
   const queryList = _.map(people, ({ email }, index) => {
-    return `query${index}: person(email: "${email}") { id email displayName }`;
+    return `query${index}: person(email: "${email}") { id email displayName presence }`;
   });
   return `{${queryList}}`;
 }

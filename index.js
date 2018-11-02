@@ -1,8 +1,10 @@
 const _ = require('underscore');
+const Q = require('q');
 
 const appFramework = require('watsonworkspace-bot');
 appFramework.level('verbose');
 appFramework.startServer();
+
 const app = appFramework.create();
 
 const { UI } = require('watsonworkspace-sdk');
@@ -18,7 +20,7 @@ const Strings = require('./js/strings');
 app.authenticate().then(() => app.uploadPhoto('./appicon.jpg'));
 
 const sendNotFound = (error, title, data, message, annotation) => {
-    console.error('[ERROR] ${title}', error);
+    console.error(`[ERROR] "${title}"`, error);
     app.sendTargetedMessage(message.userId, annotation, UI.generic(title, `${data} - not found.`));
 }
 
@@ -117,10 +119,32 @@ const onViewCommitters = (message, annotation) => {
 const onGetCommitters = (message, annotation) => {
     const { actionId = '' } = annotation;
     const [repositoryId, repositoryName] = Actions.getActionData(actionId, Constants.ACTION_GET_COMMITTERS);
+
     API.getCommitterTeams(repositoryId).then(teams => {
         teamsFound(message, annotation, { repositoryName, teams });
     }).catch(err => {
         sendNotFound(err, Constants.COMMITTERS_NOT_FOUND, repositoryName, message, annotation);
+    });
+}
+
+const onGetServiceCommitters = (message, annotation) => {
+    onFocusAction(message, annotation, findCommitters);
+}
+
+const onGetPipelineContacts = (message, annotation) => {
+    onFocusAction(message, annotation, findService);
+}
+
+const onFocusAction = (message, annotation, doService) => {
+    const { referralMessageId } = annotation;
+    return app.getMessage(referralMessageId, ['annotations']).then(({ annotations = [] }) => {
+        _.chain(annotations)
+            .where(({ type: Constants.focus.TYPE }))
+            .map(({ payload }) => {
+                doService(message, annotation, [JSON.parse(payload)]);
+            });
+    }).catch(err => {
+        sendNotFound(err, Constants.REPOSITORY_NOT_FOUND, 'Repository', message, annotation);
     });
 }
 
@@ -137,6 +161,10 @@ const onActionSelected = (message, annotation) => {
             return onViewCommitters(message, annotation);
         case actionId.startsWith(Constants.ACTION_SHARE_TEAM_COMMITTERS):
             return onShareTeamDetails(message, annotation);
+       case actionId.startsWith(Constants.focus.actions.SERVICE_COMMITTERS):
+            return onGetServiceCommitters(message, annotation);
+        case actionId.startsWith(Constants.focus.actions.PIPELINE_CONTACTS):
+            return onGetPipelineContacts(message, annotation);
         default:
             return;
     }
@@ -160,8 +188,46 @@ const findService = (message, annotation, params) => {
     });
 }
 
+const addFocus = (message, word, data, action, key) => {
+    const { content } = message;
+    const { focus: { CATEGORY, LENS } } = Constants;
+    _.each(data, ({ [key]: repo }) => {
+        if (_.isEqual(word.toLocaleLowerCase(), repo.toLocaleLowerCase())) {
+            app.addMessageFocus(message, word, LENS, CATEGORY, action, word);
+        }
+
+        // const name = Strings.humanize(repo).toLocaleLowerCase();
+        // if(content.toLocaleLowerCase().includes(name)) {
+        //     app.addMessageFocus(message, name, LENS, CATEGORY, action, repo);
+        // }
+    });
+}
+
+const onMessageCreated =  message => {
+    if (message.spaceId !== '5aaec3d1e4b0a629ce7c92b4') {
+        return;
+    }
+    const { content = '' } = message;
+    if (_.isEmpty(content)) {
+        return;
+    }
+
+    Q.allSettled([API.getServices(), API.getRepositories()]).then(([{ value: services }, { value: repositories }]) => {
+        const words = content.toLocaleLowerCase().split(' ');
+        _.each(words, word => {
+            const { focus: { COMMITTERS_ACTION, PIPELINE_ACTION } } = Constants;
+            addFocus(message, word, services, PIPELINE_ACTION, 'repo');
+            addFocus(message, word, repositories, COMMITTERS_ACTION, 'name');
+        });
+    }).catch(err => {
+        console.log('[ERROR] onMessageCreated - Add Focus Annotation', err);
+    });
+}
+
 app.on('actionSelected:/service', findService);
 
 app.on('actionSelected:/committers', findCommitters);
 
 app.on('actionSelected', onActionSelected);
+
+app.on('message-created', onMessageCreated);
